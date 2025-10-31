@@ -12,13 +12,14 @@ import ProductListing from "./ProductListing";
 import FilterButtons from "./FilterButtons";
 const { Search } = Input;
 
-const ProductsComponent = () => {
-  const navigate = useNavigate();
+const ProductsComponent = ({ onAddProduct }) => {
   const [searchFilter, setSearchFilter] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
 
   const handleAddProductClick = () => {
-    navigate("/add_product");
+    if (onAddProduct) {
+      onAddProduct();
+    }
   };
 
   const handleSearch = (event) => {

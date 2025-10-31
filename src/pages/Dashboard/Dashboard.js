@@ -15,6 +15,7 @@ import ProductsComponent from "../ProductsComponent";
 import OrdersComponent from "../OredrsComponent";
 import UsersComponent from "../UsersComponent";
 import PaymentsComponent from "../PaymentsComponents";
+import AddProductPage from "../AddProductPage";
 import { useGetUserProfileQuery } from "../../api/authApi";
 import ProfileSettings from "../SettingsComponent";
 import LogoutIcon from "../../assets/Icons/logoutIcon";
@@ -100,11 +101,11 @@ const Dashboard = () => {
       ),
       label: "Orders",
     },
-    {
-      key: "users",
-      icon: <UsersIcons color={selectedKey === "users" ? "#fff" : "#1C274C"} />,
-      label: "Users",
-    },
+    // {
+    //   key: "users",
+    //   icon: <UsersIcons color={selectedKey === "users" ? "#fff" : "#1C274C"} />,
+    //   label: "Users",
+    // },
     {
       key: "payments",
       icon: (
@@ -126,7 +127,7 @@ const Dashboard = () => {
       case "overview":
         return <OverviewComponent />;
       case "products":
-        return <ProductsComponent />;
+        return <ProductsComponent onAddProduct={() => setSelectedKey("add_product")} />;
       case "orders":
         return <OrdersComponent />;
       case "users":
@@ -135,6 +136,8 @@ const Dashboard = () => {
         return <PaymentsComponent />;
       case "settings":
         return <ProfileSettings />;
+      case "add_product":
+        return <AddProductPage />;
       default:
         return <OverviewComponent />;
     }

@@ -15,7 +15,7 @@ const items = [
 const AddProductPage = () => {
   return (
     <>
-      <StyledBreadCrumbs items={items} />
+      {/* <StyledBreadCrumbs items={items} /> */}
       <MainHeading>{`Add New Product`}</MainHeading>
       <ProductFrom />
     </>
