@@ -1,0 +1,157 @@
+/* Login.module.css */
+
+.loginContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin-top: 90px; /* Example margin */
+  h2 {
+    color: #222;
+    font-family: Inter;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    text-align: left;
+    margin: 0;
+  }
+  p {
+    color: #222;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+    text-align: left;
+    margin-top: 8px;
+    margin-bottom: 32px;
+  }
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: start;
+  width: 80%;
+  margin-bottom: 20px;
+  lable {
+    color: #222;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+  }
+}
+
+.loginInput {
+  padding: 10px;
+  font-size: 16px;
+  width: 370px;
+  border-radius: 4px;
+  border: 1px solid var(--Field-Stroke, #e1e1e1);
+  background: var(--Color-Neutral-white, #fff);
+}
+
+.loginButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #007bff; /* Example background color */
+  color: white;
+  border: none;
+}
+
+.loginButton:hover {
+  background-color: #0056b3; /* Example hover color */
+}
+
+.loginPageWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5%;
+  margin-top: 100px;
+}
+
+.leftContainer {
+  border-radius: 50%;
+  background: rgba(255, 179, 0, 0.1);
+  min-height: 490px;
+  width: 50%;
+  box-shadow: 0 0 100px 80px rgba(255, 179, 0, 0.1);
+}
+
+.InnerContainer {
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 140px;
+}
+
+.rightContainer {
+  width: 40%;
+}
+
+.mainHeading {
+  margin: 0px;
+  color: #2e2a40;
+  text-align: center;
+  font-family: Inter;
+  font-size: 46px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.mainSubHeading {
+  margin: 0;
+  margin-top: 18px;
+  color: #2e2a40;
+  text-align: center;
+  font-family: Inter;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 28.16px; /* 156.444% */
+}
+
+.InnerContainer2 {
+  background-image: url("../../assets/Images/pagebackground.png");
+}
+
+.btnWrapper {
+  width: 80%;
+  a {
+    text-decoration: none;
+    color: #6b7280;
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    text-align: right;
+    display: block;
+  }
+  button {
+    border-radius: 4px;
+    background: var(--Primary-Color, #f88e48);
+    width: 100%;
+    border: 1px solid #f88e48;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+  button:hover {
+    border: 1px solid #f88e48;
+    color: #000;
+    background-color: #fff;
+  }
+}
+
+.logoWrapper {
+  text-align: center;
+  width: 80%;
+}
