@@ -77,6 +77,7 @@ const ProductOptions = ({ payload, setPayload }) => {
   };
 
   const generateVariants = () => {
+    console.log("Generating variants with options:", options);
     if (options.length === 0) return [];
     const tagsArrays = options.map((option) => option.values);
     const newVariants = cartesianProduct(tagsArrays).map((variant, index) => ({

@@ -101,8 +101,10 @@ const UploadImages = ({ handleProductImages }) => {
               position: "relative",
             }}
             onClick={() => {
-              inputRef.current.removeAttribute("data-replace");
-              inputRef.current.click();
+              if (inputRef.current) {
+                inputRef.current.removeAttribute("data-replace");
+                inputRef.current.click();
+              }
             }}
           >
             <img src={image} alt="Upload" style={{ width: 32, height: 32, marginBottom: 8, color: "#fa8c16" }} />

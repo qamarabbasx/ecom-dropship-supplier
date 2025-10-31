@@ -25,16 +25,43 @@ import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 const { Option } = StyledSelect;
 
+const PREDEFINED_CATEGORIES = [
+  "Electronics",
+  "Home & Kitchen",
+  "Beauty",
+  "Sports",
+  "Toys",
+  "others",
+];
+
 const ProductForm = () => {
   const navigate = useNavigate();
   const [payload, setPayload] = useState({
     ...ADD_PRODUCT_PAYLOAD,
     type: "THIRD_PARTY",
+    category: "",
   });
   const [addProduct] = useAddProductMutation();
+  const [customCategory, setCustomCategory] = useState("");
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
 
   const handleInputField = (key, value) => {
-    setPayload({ ...payload, [key]: value });
+    if (key === "category") {
+      if (value === "others") {
+        setIsCustomCategory(true);
+        setCustomCategory("");
+        setPayload({ ...payload, category: "" });
+      } else if (PREDEFINED_CATEGORIES.includes(value)) {
+        setIsCustomCategory(false);
+        setPayload({ ...payload, category: value });
+        setCustomCategory("");
+      } else {
+        setCustomCategory(value);
+        setPayload({ ...payload, category: value });
+      }
+    } else {
+      setPayload({ ...payload, [key]: value });
+    }
   };
 
   const handleProductImages = (images) => {
@@ -58,6 +85,7 @@ const ProductForm = () => {
       JSON.stringify({
         name: payload.name,
         description: payload.description,
+        category: payload.category,
         type: payload.type,
         price: payload.price,
         MSRP: payload.MSRP,
@@ -108,17 +136,29 @@ const ProductForm = () => {
         </InputWrapper>
         <InputWrapper>
           <StyledLabel>{`Product Category`}</StyledLabel>
-          <StyledSelect
-            placeholder="Select Category"
-            onChange={(value) => handleInputField("category", value)}
-          >
-            <Option value="Electronics">Electronics</Option>
-            <Option value="Home & Kitchen">Home & Kitchen</Option>
-            <Option value="Beauty">Beauty</Option>
-            <Option value="Sports">Sports</Option>
-            <Option value="Toys">Toys</Option>
-            <Option value="others">Others</Option>
-          </StyledSelect>
+          {isCustomCategory ? (
+            <StyledInput
+              placeholder="Enter Category"
+              value={customCategory}
+              onChange={(e) => {
+                setCustomCategory(e.target.value);
+                setPayload({ ...payload, category: e.target.value });
+              }}
+            />
+          ) : (
+            <StyledSelect
+              placeholder="Select Category"
+              onChange={(value) => handleInputField("category", value)}
+              value={PREDEFINED_CATEGORIES.includes(payload.category) ? payload.category : undefined}
+            >
+              <Option value="Electronics">Electronics</Option>
+              <Option value="Home & Kitchen">Home & Kitchen</Option>
+              <Option value="Beauty">Beauty</Option>
+              <Option value="Sports">Sports</Option>
+              <Option value="Toys">Toys</Option>
+              <Option value="others">Others</Option>
+            </StyledSelect>
+          )}
         </InputWrapper>
         <InputWrapper>
           <StyledLabel>{`Product Price`}</StyledLabel>
