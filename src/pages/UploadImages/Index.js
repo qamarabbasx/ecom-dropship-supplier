@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Image, Upload } from "antd";
+const { Dragger } = Upload;
 
 const UploadImages = ({ handleProductImages }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -27,27 +28,24 @@ const UploadImages = ({ handleProductImages }) => {
       type="button"
     >
       <PlusOutlined />
-      <div
-        style={{
-          marginTop: 8,
-        }}
-      >
-        Upload
-      </div>
+      <div style={{ marginTop: 8 }}>Upload</div>
     </button>
   );
 
   return (
     <>
-      <Upload
+      <Dragger
         listType="picture-card"
         fileList={fileList}
         onPreview={handlePreview}
         onChange={handleChange}
         beforeUpload={() => false}
+        multiple
+        style={{ padding: 20 }}
       >
         {fileList.length >= 8 ? null : uploadButton}
-      </Upload>
+        <p style={{ marginTop: 16 }}>Drag & drop files here, or click to select</p>
+      </Dragger>
       {previewImage && (
         <Image
           wrapperStyle={{
@@ -56,7 +54,7 @@ const UploadImages = ({ handleProductImages }) => {
           preview={{
             visible: previewOpen,
             onVisibleChange: (visible) => setPreviewOpen(visible),
-            afterOpenChange: (visible) => !visible && setPreviewImage(""),
+            afterOpenChange: (visible) => !visible && setPreviewImage("")
           }}
           src={previewImage}
         />
