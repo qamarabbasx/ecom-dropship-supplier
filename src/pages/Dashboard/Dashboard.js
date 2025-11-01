@@ -19,7 +19,7 @@ import AddProductPage from "../AddProductPage";
 import { useGetUserProfileQuery } from "../../api/authApi";
 import ProfileSettings from "../SettingsComponent";
 import LogoutIcon from "../../assets/Icons/logoutIcon";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useLogoutMutation } from "../../api/authApi";
 import { clearToken } from "../../store/authSlice";
@@ -36,14 +36,21 @@ const siderStyle = {
   scrollbarColor: "unset",
 };
 const Dashboard = () => {
+  const location = useLocation();
   const [selectedKey, setSelectedKey] = useState("overview");
+
+  // Set selectedKey from navigation state if present
+  React.useEffect(() => {
+    if (location.state && location.state.selectedKey) {
+      setSelectedKey(location.state.selectedKey);
+    }
+  }, [location.state]);
 
   const { data: userProfile, error } = useGetUserProfileQuery();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
-  
 
   const handleLogout = async () => {
     try {

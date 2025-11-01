@@ -6,6 +6,7 @@ import { eventWrapper } from "@testing-library/user-event/dist/utils";
 import { useLoginMutation } from "../../api/authApi";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../store/authSlice";
+import { message } from "antd";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -18,16 +19,18 @@ const Login = () => {
     try {
       const userCredentials = { email: username, password };
       const result = await login(userCredentials).unwrap();
-      if (result && (result.user.role === 'SUPER_ADMIN' || result.user.role === 'ADMIN')) {
+      console.log('\n\n result \n\n', result);
+      if (result && (result.user.role === 'SUPPLIER')) {
         console.log('\n\n result \n\n', result);
         dispatch(setToken(result.token));
         sessionStorage.setItem("user", username);
         navigate("/dashboard");
-      }else{
-        alert("Login failed: Invalid credentials");
+      } else {
+        message.error("Unauthorized user role");
       }
     } catch (err) {
-      alert("Login failed: Invalid credentials");
+      console.log('\n\n err \n\n', err);
+      message.error("Login failed: " + (err.data?.message || err.message));
     }
   };
 

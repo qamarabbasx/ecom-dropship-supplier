@@ -117,10 +117,19 @@ const ProductForm = () => {
         formData.append(`variant_image_${index}`, variant.image);
       }
     });
-    const response = await addProduct(formData);
-    if (response?.data) {
-      message.success("Product Added");
-      navigate("/");
+    try {
+      const response = await addProduct(formData);
+      console.log("Add Product Response:", response);
+      if (response?.data) {
+        message.success("Product Added");
+        navigate("/dashboard", { state: { selectedKey: "products" } });
+      } else if (response?.error) {
+        console.log("Add Product Response:response?.error", response?.error);
+        message.error("Failed to add product: " + (response.error.data?.message || response.error.message));
+      }
+    } catch (err) {
+      console.log("Error adding product:", err);
+      message.error("Failed to add product.");
     }
   };
 
