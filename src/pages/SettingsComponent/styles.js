@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Button } from "antd";
 
 export const Container = styled.div`
   max-width: 800px;
@@ -20,7 +21,7 @@ export const Title = styled.h3`
   margin-bottom: 16px;
 `;
 
-export const SaveButton = styled.button`
+export const SaveButton = styled(Button)`
   background-color: #fa8c16;
   color: #fff;
   border: none;
@@ -28,8 +29,14 @@ export const SaveButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   float: right;
+  height: auto;
 
   &:hover {
-    background-color: #d87a13;
+    background-color: #d87a13 !important;
+    color: #fff !important;
+  }
+
+  &.ant-btn-loading {
+    background-color: #fa8c16;
   }
 `;
