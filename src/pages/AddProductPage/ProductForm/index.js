@@ -19,7 +19,6 @@ import {
 import UploadImages from "../../UploadImages/Index";
 import ProductOptions from "../ProductsVarients";
 import { useAddProductMutation } from "../../../api/productApi";
-import { omit } from "lodash";
 import { ADD_PRODUCT_PAYLOAD } from "../../../utils/constants";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -41,6 +40,7 @@ const ProductForm = () => {
     type: "THIRD_PARTY",
     category: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
   const [addProduct] = useAddProductMutation();
   const [customCategory, setCustomCategory] = useState("");
   const [isCustomCategory, setIsCustomCategory] = useState(false);
@@ -79,6 +79,7 @@ const ProductForm = () => {
   };
 
   const handleAddProduct = async () => {
+    setIsLoading(true);
     let formData = new FormData();
     formData.append(
       "product",
@@ -105,6 +106,7 @@ const ProductForm = () => {
         metaData: payload.meta,
       })
     );
+    console.log("Form Data Product:", formData.get("product"));
 
     // Append product images
     payload.images.forEach((file, index) => {
@@ -122,12 +124,15 @@ const ProductForm = () => {
       console.log("Add Product Response:", response);
       if (response?.data) {
         message.success("Product Added");
+        setIsLoading(false);
         navigate("/dashboard", { state: { selectedKey: "products" } });
       } else if (response?.error) {
         console.log("Add Product Response:response?.error", response?.error);
+        setIsLoading(false);
         message.error("Failed to add product: " + (response.error.data?.message || response.error.message));
       }
     } catch (err) {
+      setIsLoading(false);
       console.log("Error adding product:", err);
       message.error("Failed to add product.");
     }
@@ -211,7 +216,7 @@ const ProductForm = () => {
               justifyContent: "flex-end",
             }}
           >
-            <StyledSaveButton size="large" onClick={handleAddProduct}>
+            <StyledSaveButton size="large" onClick={handleAddProduct} loading={isLoading}>
               Add Product
             </StyledSaveButton>
           </div>
@@ -263,26 +268,31 @@ const ProductForm = () => {
           <ProductMetaData>
             <StyledLabel>{`Product Total Sales`}</StyledLabel>
             <StyledInput
+              type="number"
               placeholder="Enter Total Sales"
               onChange={(e) => handleMeta("totalSales", e.target.value)}
             />
             <StyledLabel>{`GMV`}</StyledLabel>
             <StyledInput
-              placeholder="Enter GMV"
+              type="number"
+              placeholder="Enter GMV ($)"
               onChange={(e) => handleMeta("GMV", e.target.value)}
             />
             <StyledLabel>{`Total Influencers`}</StyledLabel>
             <StyledInput
+            type="number"
               placeholder="Enter Total Influencers"
               onChange={(e) => handleMeta("totalInfluencers", e.target.value)}
             />
             <StyledLabel>{`Total Videos`}</StyledLabel>
             <StyledInput
+              type="number"
               placeholder="Enter Total Videos"
               onChange={(e) => handleMeta("totalVideos", e.target.value)}
             />
             <StyledLabel>{`Total Comments`}</StyledLabel>
             <StyledInput
+              type="number"
               placeholder="Enter Total Comments"
               onChange={(e) => handleMeta("totalComments", e.target.value)}
             />

@@ -1,5 +1,5 @@
 
-const baseUrl = process.env.REACT_APP_BASE_URL || "https://backend.ecomdropship.ai/"; //"http://localhost:8000/";
+const baseUrl = process.env.REACT_APP_BASE_URL || "https://api.ecomdropship.ai/"; //"http://localhost:8000/";
 
 
 const uploadFileToS3 = async (file) => {
