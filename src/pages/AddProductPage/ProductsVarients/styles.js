@@ -75,4 +75,36 @@ export const IconWrapper = styled.span`
 export const VariantsWrapper = styled.div`
   margin-top: 10px;
   padding: 20px;
+
+  .ant-table {
+    font-size: 16px;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: #f9fafb;
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 16px;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 16px;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 16px;
+    vertical-align: middle;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background-color: #f9fafb;
+  }
+
+  .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select {
+    border: 2px dashed #f88e48;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+
+  .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select:hover {
+    border-color: #f88e48;
+  }
 `;

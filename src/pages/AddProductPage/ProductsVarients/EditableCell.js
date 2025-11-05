@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Input, InputNumber, Form } from "antd";
 
 const EditableCell = ({
@@ -9,42 +9,27 @@ const EditableCell = ({
   record,
   handleSave,
   form,
+  editing,
   ...restProps
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
-
-  const toggleEdit = () => {
-    setIsEditing(!isEditing);
-    form.setFieldsValue({
-      [dataIndex]: record[dataIndex],
-    });
-  };
-
-  const save = async () => {
-    try {
-      const row = await form.validateFields();
-      handleSave({ ...record, ...row });
-      toggleEdit();
-    } catch (err) {
-      console.log("Save failed:", err);
-    }
-  };
-
   let childNode = children;
 
-  if (editable && isEditing) {
+  if (editable && editing) {
     childNode =
-      dataIndex === "price" || dataIndex === "qty" ? (
+      dataIndex === "price" || dataIndex === "totalStock" ? (
         <Form.Item
           style={{ margin: 0 }}
           name={dataIndex}
           rules={[{ required: true, message: `${title} is required.` }]}
         >
-          {dataIndex === "price" ? (
-            <InputNumber min={0} step={1} onBlur={save} autoFocus />
-          ) : (
-            <Input onBlur={save} autoFocus />
-          )}
+          <InputNumber 
+            min={0} 
+            step={1} 
+            autoFocus 
+            style={{ width: "100%" }}
+            formatter={(value) => dataIndex === "price" ? `$ ${value}` : value}
+            parser={(value) => dataIndex === "price" ? value.replace(/\$\s?/g, '') : value}
+          />
         </Form.Item>
       ) : (
         <Form.Item
@@ -52,7 +37,7 @@ const EditableCell = ({
           name={dataIndex}
           rules={[{ required: true, message: `${title} is required.` }]}
         >
-          <Input onBlur={save} autoFocus />
+          <Input autoFocus />
         </Form.Item>
       );
   } else {
@@ -60,7 +45,6 @@ const EditableCell = ({
       <div
         className="editable-cell-value-wrap"
         style={{ paddingRight: 24 }}
-        onClick={toggleEdit}
       >
         {children}
       </div>

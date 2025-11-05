@@ -82,6 +82,8 @@ export const ProductMetaData = styled.div`
   border-radius: 5px;
   border: 1px solid #b5b3b3;
   padding: 20px;
+  margin-top: 20px;
+  background-color: #fff;
 `;
 
 export const StyledSaveButton = styled(AntButton)`

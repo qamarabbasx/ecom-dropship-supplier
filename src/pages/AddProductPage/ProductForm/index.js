@@ -19,7 +19,6 @@ import {
 import UploadImages from "../../UploadImages/Index";
 import ProductOptions from "../ProductsVarients";
 import { useAddProductMutation } from "../../../api/productApi";
-import { omit } from "lodash";
 import { ADD_PRODUCT_PAYLOAD } from "../../../utils/constants";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -41,9 +40,10 @@ const ProductForm = () => {
     type: "THIRD_PARTY",
     category: "",
   });
-  const [addProduct] = useAddProductMutation();
+  const [addProduct, { isLoading }] = useAddProductMutation();
   const [customCategory, setCustomCategory] = useState("");
   const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [isMetaDataExpanded, setIsMetaDataExpanded] = useState(false);
 
   const handleInputField = (key, value) => {
     if (key === "category") {
@@ -205,14 +205,73 @@ const ProductForm = () => {
         <LeftCol>
           <StyledLabel>{`Product Variants`}</StyledLabel>
           <ProductOptions payload={payload} setPayload={setPayload} />
+          <br />
+          <StyledLabel>{`Metadata`}</StyledLabel>
+          <ProductMetaData>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+                // padding: "0px 0",
+              }}
+              onClick={() => setIsMetaDataExpanded(!isMetaDataExpanded)}
+            >
+              <StyledLabel style={{ margin: 0 }}>{`Add Metadata`}</StyledLabel>
+              <span
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#f88e48",
+                }}
+              >
+                {isMetaDataExpanded ? "−" : "+"}
+              </span>
+            </div>
+            {isMetaDataExpanded && (
+              <div style={{ marginTop: "20px" }}>
+                <StyledLabel>{`Product Total Sales`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Sales"
+                  onChange={(e) => handleMeta("totalSales", e.target.value)}
+                />
+                <StyledLabel>{`GMV`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter GMV"
+                  onChange={(e) => handleMeta("GMV", e.target.value)}
+                />
+                <StyledLabel>{`Total Influencers`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Influencers"
+                  onChange={(e) => handleMeta("totalInfluencers", e.target.value)}
+                />
+                <StyledLabel>{`Total Videos`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Videos"
+                  onChange={(e) => handleMeta("totalVideos", e.target.value)}
+                />
+                <StyledLabel>{`Total Comments`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Comments"
+                  onChange={(e) => handleMeta("totalComments", e.target.value)}
+                />
+              </div>
+            )}
+          </ProductMetaData>
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
             }}
           >
-            <StyledSaveButton size="large" onClick={handleAddProduct}>
-              Add Product
+            <StyledSaveButton 
+              size="large" 
+              onClick={handleAddProduct}
+              loading={isLoading}
+              disabled={isLoading}
+            >
+              {isLoading ? "Adding Product..." : "Add Product"}
             </StyledSaveButton>
           </div>
         </LeftCol>
@@ -259,34 +318,59 @@ const ProductForm = () => {
               onChange={(e) => handleInputField("sku", e.target.value)}
             />
           </ProductOrganization>
-          <StyledLabel>{`Product Meta Data`}</StyledLabel>
+          {/* <StyledLabel>{`Product Meta Data`}</StyledLabel>
           <ProductMetaData>
-            <StyledLabel>{`Product Total Sales`}</StyledLabel>
-            <StyledInput
-              placeholder="Enter Total Sales"
-              onChange={(e) => handleMeta("totalSales", e.target.value)}
-            />
-            <StyledLabel>{`GMV`}</StyledLabel>
-            <StyledInput
-              placeholder="Enter GMV"
-              onChange={(e) => handleMeta("GMV", e.target.value)}
-            />
-            <StyledLabel>{`Total Influencers`}</StyledLabel>
-            <StyledInput
-              placeholder="Enter Total Influencers"
-              onChange={(e) => handleMeta("totalInfluencers", e.target.value)}
-            />
-            <StyledLabel>{`Total Videos`}</StyledLabel>
-            <StyledInput
-              placeholder="Enter Total Videos"
-              onChange={(e) => handleMeta("totalVideos", e.target.value)}
-            />
-            <StyledLabel>{`Total Comments`}</StyledLabel>
-            <StyledInput
-              placeholder="Enter Total Comments"
-              onChange={(e) => handleMeta("totalComments", e.target.value)}
-            />
-          </ProductMetaData>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+                // padding: "0px 0",
+              }}
+              onClick={() => setIsMetaDataExpanded(!isMetaDataExpanded)}
+            >
+              <StyledLabel style={{ margin: 0 }}>{`Add Metadata`}</StyledLabel>
+              <span
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#f88e48",
+                }}
+              >
+                {isMetaDataExpanded ? "−" : "+"}
+              </span>
+            </div>
+            {isMetaDataExpanded && (
+              <div style={{ marginTop: "20px" }}>
+                <StyledLabel>{`Product Total Sales`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Sales"
+                  onChange={(e) => handleMeta("totalSales", e.target.value)}
+                />
+                <StyledLabel>{`GMV`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter GMV"
+                  onChange={(e) => handleMeta("GMV", e.target.value)}
+                />
+                <StyledLabel>{`Total Influencers`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Influencers"
+                  onChange={(e) => handleMeta("totalInfluencers", e.target.value)}
+                />
+                <StyledLabel>{`Total Videos`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Videos"
+                  onChange={(e) => handleMeta("totalVideos", e.target.value)}
+                />
+                <StyledLabel>{`Total Comments`}</StyledLabel>
+                <StyledInput
+                  placeholder="Enter Total Comments"
+                  onChange={(e) => handleMeta("totalComments", e.target.value)}
+                />
+              </div>
+            )}
+          </ProductMetaData> */}
         </RightCol>
       </BottomContainer>
     </MainContainer>

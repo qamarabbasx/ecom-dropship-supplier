@@ -27,6 +27,7 @@ const ProductOptions = ({ payload, setPayload }) => {
   ]);
   const [variants, setVariants] = useState([]);
   const [form] = Form.useForm();
+  const [editingKey, setEditingKey] = useState("");
 
   const handleAddOption = () => {
     const newOption = { id: Date.now(), name: "", values: [] };
@@ -99,22 +100,41 @@ const ProductOptions = ({ payload, setPayload }) => {
     }));
   };
 
-  const handleSave = (updatedRow) => {
-    const newVariants = variants.map((item) => {
-      if (item.key === updatedRow.key) {
-        return {
-          ...item,
-          ...updatedRow,
-          status: updatedRow.totalStock > 0 ? "In Stock" : "Out of Stock",
-        };
-      }
-      return item;
+  const handleEdit = (record) => {
+    form.setFieldsValue({
+      price: record.price,
+      totalStock: record.totalStock,
+      ...record,
     });
-    setVariants(newVariants);
-    setPayload((prevPayload) => ({
-      ...prevPayload,
-      variants: newVariants,
-    }));
+    setEditingKey(record.key);
+  };
+
+  const handleSave = async (key) => {
+    try {
+      const row = await form.validateFields();
+      const newVariants = variants.map((item) => {
+        if (item.key === key) {
+          return {
+            ...item,
+            ...row,
+            status: row.totalStock > 0 ? "In Stock" : "Out of Stock",
+          };
+        }
+        return item;
+      });
+      setVariants(newVariants);
+      setPayload((prevPayload) => ({
+        ...prevPayload,
+        variants: newVariants,
+      }));
+      setEditingKey("");
+    } catch (errInfo) {
+      console.log("Validate Failed:", errInfo);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingKey("");
   };
 
   const handleDelete = (key) => {
@@ -125,6 +145,8 @@ const ProductOptions = ({ payload, setPayload }) => {
       variants: newVariants,
     }));
   };
+
+  const isEditing = (record) => record.key === editingKey;
 
 
   const handleImageChange = async (info, key) => {
@@ -161,15 +183,16 @@ const ProductOptions = ({ payload, setPayload }) => {
    }
   };
 
-  const columns = getColumns(handleDelete, handleImageChange).map((col) => ({
+  const columns = getColumns(handleDelete, handleImageChange, handleEdit, handleSave, handleCancel, editingKey).map((col) => ({
     ...col,
     onCell: (record) => ({
       record,
       editable: col.editable,
       dataIndex: col.dataIndex,
       title: col.title,
-      handleSave,
+      handleSave: () => handleSave(record.key),
       form,
+      editing: isEditing(record),
     }),
   }));
 
@@ -212,7 +235,9 @@ const ProductOptions = ({ payload, setPayload }) => {
         <StyledButton onClick={generateVariants}>
           Generate Variants
         </StyledButton>
+{variants.length > 0 && (
         <div className="variants-list">
+        <br />
           <h2>Variants</h2>
           <Form form={form} component={false}>
             <Table
@@ -221,14 +246,20 @@ const ProductOptions = ({ payload, setPayload }) => {
                   cell: EditableCell,
                 },
               }}
-              bordered
+              bordered={false}
               dataSource={variants}
               columns={columns}
               rowClassName="editable-row"
               pagination={false}
+              style={{ 
+                border: "1px solid #e5e7eb", 
+                borderRadius: "8px",
+                overflow: "hidden"
+              }}
             />
           </Form>
-        </div>
+        </div>)
+        }
       </VariantsWrapper>
     </MainContainer>
   );

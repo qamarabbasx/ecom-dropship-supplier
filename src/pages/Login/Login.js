@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 import logo from "../../assets/Images/logo.png";
-import { eventWrapper } from "@testing-library/user-event/dist/utils";
 import { useLoginMutation } from "../../api/authApi";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../store/authSlice";
@@ -32,6 +31,11 @@ const Login = () => {
       console.log('\n\n err \n\n', err);
       message.error("Login failed: " + (err.data?.message || err.message));
     }
+  };
+
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    message.info("Coming soon...");
   };
 
   return (
@@ -75,12 +79,22 @@ const Login = () => {
               />
             </div>
             <div className={styles.btnWrapper}>
-              <a href="#">Forgot Password?</a>
+              <a href="#" onClick={handleForgotPassword}>Forgot Password?</a>
               <button
                 onClick={handleLogin}
                 className={`${styles.loginButton} mt-20`}
+                disabled={isLoading}
+                aria-busy={isLoading}
+                aria-disabled={isLoading}
               >
-                Sign In
+                {isLoading ? (
+                  <>
+                    <span className={styles.spinner} aria-hidden="true" />
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
               </button>
             </div>
           </div>
