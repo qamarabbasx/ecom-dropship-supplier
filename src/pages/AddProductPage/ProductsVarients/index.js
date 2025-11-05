@@ -222,7 +222,10 @@ const ProductOptions = ({ payload, setPayload }) => {
             <StyledLabel>{`Values`}</StyledLabel>
             <TagsInput
               value={option.values}
-              onChange={(values) => handleTagChange(option.id, values)}
+              onChange={(values) => {
+                console.log("TagsInput onChange triggered with values:", values);
+                handleTagChange(option.id, values);
+              }}
               inputProps={{ placeholder: "Values" }}
             />
           </OptionValues>

@@ -105,6 +105,7 @@ const ProductForm = () => {
         metaData: payload.meta,
       })
     );
+    console.log("Form Data Product:", formData.get("product"));
 
     // Append product images
     payload.images.forEach((file, index) => {
@@ -233,26 +234,31 @@ const ProductForm = () => {
               <div style={{ marginTop: "20px" }}>
                 <StyledLabel>{`Product Total Sales`}</StyledLabel>
                 <StyledInput
+                  type="number"
                   placeholder="Enter Total Sales"
                   onChange={(e) => handleMeta("totalSales", e.target.value)}
                 />
                 <StyledLabel>{`GMV`}</StyledLabel>
                 <StyledInput
-                  placeholder="Enter GMV"
+                  type="number"
+                  placeholder="Enter GMV ( $ )"
                   onChange={(e) => handleMeta("GMV", e.target.value)}
                 />
                 <StyledLabel>{`Total Influencers`}</StyledLabel>
                 <StyledInput
+                  type="number"
                   placeholder="Enter Total Influencers"
                   onChange={(e) => handleMeta("totalInfluencers", e.target.value)}
                 />
                 <StyledLabel>{`Total Videos`}</StyledLabel>
                 <StyledInput
+                  type="number"
                   placeholder="Enter Total Videos"
                   onChange={(e) => handleMeta("totalVideos", e.target.value)}
                 />
                 <StyledLabel>{`Total Comments`}</StyledLabel>
                 <StyledInput
+                  type="number"
                   placeholder="Enter Total Comments"
                   onChange={(e) => handleMeta("totalComments", e.target.value)}
                 />
@@ -265,8 +271,8 @@ const ProductForm = () => {
               justifyContent: "flex-end",
             }}
           >
-            <StyledSaveButton 
-              size="large" 
+            <StyledSaveButton
+              size="large"
               onClick={handleAddProduct}
               loading={isLoading}
               disabled={isLoading}

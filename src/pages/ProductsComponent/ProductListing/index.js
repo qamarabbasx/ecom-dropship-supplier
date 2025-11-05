@@ -77,14 +77,13 @@ const ProductListing = ({
 
   return (
     <TableWrapper>
-      {isLoading ? (
-        <Spin size="large" />
-      ) : (
+      {(
         <Table
           columns={columns}
           dataSource={productListingData?.products || []}
           rowKey="id"
           onChange={handleTableChange}
+          loading={isLoading}
           pagination={{
             current: page,
             pageSize: limit,

@@ -19,7 +19,7 @@ const ProfileSettings = () => {
     console.log("Profile Information:", values);
     const { firstName, lastName, phoneNumber } = values;
     try {
-      const response = await updateUser({firstName, lastName, phoneNumber});
+      const response = await updateUser({ firstName, lastName, phoneNumber });
       if (response.error) {
         throw new Error(response.error.message);
       }
@@ -40,7 +40,6 @@ const ProfileSettings = () => {
     }
 
     try {
-      
       const response = await changePassword({ password: newPassword });
       if (response.error) {
         throw new Error(response.error.message);
@@ -93,7 +92,7 @@ const ProfileSettings = () => {
           </Form.Item>
 
           <Form.Item>
-            <SaveButton type="submit" loading={isUpdatingUser}>Save Changes</SaveButton>
+            <SaveButton htmlType="submit" loading={isUpdatingUser}>{isUpdatingUser ? "Updating..." : "Save Changes"}</SaveButton>
           </Form.Item>
         </Form>
       </Section>
@@ -118,8 +117,17 @@ const ProfileSettings = () => {
           <Form.Item
             name="newPassword"
             label="New Password"
+            dependencies={["currentPassword"]}
             rules={[
               { required: true, message: "Please enter your new password" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (getFieldValue("currentPassword") === value) {
+                    return Promise.reject(new Error("New password must be different from current password"));
+                  }
+                  return Promise.resolve();
+                },
+              }),
             ]}
           >
             <Input.Password />
@@ -145,7 +153,7 @@ const ProfileSettings = () => {
           </Form.Item>
 
           <Form.Item>
-            <SaveButton type="submit">Save Changes</SaveButton>
+            <SaveButton htmlType="submit" loading={isChangingPassword}>{isChangingPassword ? "Changing..." : "Change Password"}</SaveButton>
           </Form.Item>
         </Form>
       </Section>
