@@ -292,7 +292,7 @@ const ProductForm = () => {
               <Option value="SOLD">Sold</Option>
               <Option value="NEW">New</Option>
               <Option value="INCOMMING">Incomming</Option>
-              <Option value="TICK_TOK_VERIFIED">Tiktok Verified </Option>
+              {/* <Option value="TICK_TOK_VERIFIED">Tiktok Verified </Option> */} 
             </StyledSelect>
             <StyledLabel>{`Vendors`}</StyledLabel>
             <StyledInput
