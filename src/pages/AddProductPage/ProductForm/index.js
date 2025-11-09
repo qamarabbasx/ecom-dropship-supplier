@@ -310,8 +310,8 @@ const ProductForm = () => {
               <Option value="OUT_OF_STOCK">OUT OF STOCK</Option>
               <Option value="BACK_ORDER">BACK ORDER</Option>
             </StyledSelect>
-            <StyledLabel>{`Product Type`}</StyledLabel>
-            <StyledSelect
+            {/* <StyledLabel>{`Product Type`}</StyledLabel> */}
+            {/* <StyledSelect
               placeholder="Enter Product Type"
               onChange={(value) => handleInputField("type", value)}
             >
@@ -319,7 +319,7 @@ const ProductForm = () => {
               <Option value="REQUESTED">Requested</Option>
               <Option value="PRIVATE_SOURCE">Private Sourcing</Option>
               <Option value="THIRD_PARTY">Third Party</Option>
-            </StyledSelect>
+            </StyledSelect> */}
             <StyledLabel>{`Product SKU`}</StyledLabel>
             <StyledInput
               placeholder="Enter Product SKU"
