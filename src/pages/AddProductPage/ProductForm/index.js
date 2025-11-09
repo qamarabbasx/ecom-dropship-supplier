@@ -173,6 +173,7 @@ const ProductForm = () => {
         <InputWrapper>
           <StyledLabel>{`Product Price`}</StyledLabel>
           <StyledInput
+            type="number"
             placeholder="$90"
             onChange={(e) =>
               handleInputField("price", parseInt(e.target.value))
@@ -182,6 +183,7 @@ const ProductForm = () => {
         <InputWrapper>
           <StyledLabel>{`MSRP`}</StyledLabel>
           <StyledInput
+            type="number"
             placeholder="$90"
             onChange={(e) => handleInputField("MSRP", parseInt(e.target.value))}
           />
