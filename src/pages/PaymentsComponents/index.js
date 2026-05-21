@@ -25,6 +25,8 @@ const onSearch = (value, _e, info) => console.log(info?.source, value);
 const PaymentsComponent = () => {
   const [searchFilter, setSearchFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [dateFilter, setDateFilter] = useState("Today");
+  
   const handleSearch = (event) => {
     const value = event.target.value;
     setSearchFilter(value.trim());
@@ -36,13 +38,16 @@ const PaymentsComponent = () => {
   const handleStatusChange = (value) => {
     setStatusFilter(value);
   };
+  const handleDateChange = (value) => {
+    setDateFilter(value);
+  };
   return (
     <MainContainer>
-      <MainHeading> Product Payment History</MainHeading>
+      <MainHeading>Payment History</MainHeading>
       <ProductsHeader>
         <div>
           <Search
-            placeholder="input search text"
+            placeholder="Search"
             onSearch={(value) => setSearchFilter(value)}
             onChange={handleSearch}
             style={{
@@ -50,7 +55,17 @@ const PaymentsComponent = () => {
             }}
           />
         </div>
-        <div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <FilterContainer>
+            <CustomSelect defaultValue="Today" onChange={handleDateChange}>
+              <StyledOption value="Today">Today</StyledOption>
+              <StyledOption value="Yesterday">Yesterday</StyledOption>
+              <StyledOption value="Last 7 Days">Last 7 Days</StyledOption>
+              <StyledOption value="Last 30 Days">Last 30 Days</StyledOption>
+              <StyledOption value="This Month">This Month</StyledOption>
+              <StyledOption value="Last Month">Last Month</StyledOption>
+            </CustomSelect>
+          </FilterContainer>
           <FilterContainer>
             <CustomSelect defaultValue="ALL" onChange={handleStatusChange}>
               <StyledOption value="ALL">All</StyledOption>
@@ -66,6 +81,7 @@ const PaymentsComponent = () => {
       <PaymentsListing
         searchFilter={searchFilter}
         statusFilter={statusFilter}
+        dateFilter={dateFilter}
       />
       {/* <InvoiceDetail /> */}
     </MainContainer>

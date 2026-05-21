@@ -1,6 +1,5 @@
-import React from "react";
-import { Table, Card, Row, Col, Statistic, Button, Select } from "antd";
-import { ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
+import { Table, Card, Row, Col, Statistic, Flex, Tag, Button } from "antd";
+import { RiseOutlined } from "@ant-design/icons";
 import {
   DashboardContainer,
   StatisticContainer,
@@ -10,20 +9,35 @@ import {
 } from "./styles";
 import { useGetOverviewQuery } from "../../api/authApi";
 import { useGetOrdersQuery } from "../../api/authApi";
-
-
+import { useNavigate } from "react-router-dom";
+import timePng from "../../assets/Icons/time.png";
+import graphPng from "../../assets/Icons/graph.png";
+import usersPng from "../../assets/Icons/users.png";
+import growthPng from "../../assets/Icons/growth.png";
 const OverviewComponent = () => {
-  const { data: overviewData, isLoading: isOverviewLoading, isError: isOverviewError } = useGetOverviewQuery();
-  
-  const { data: orderListingData, isLoading: isOrdersLoading, isError: isOrdersError } = useGetOrdersQuery({
+  const navigate = useNavigate();
+
+  const {
+    data: overviewData,
+    isLoading: isOverviewLoading,
+    isError: isOverviewError,
+  } = useGetOverviewQuery();
+
+  const {
+    data: orderListingData,
+    isLoading: isOrdersLoading,
+    isError: isOrdersError,
+  } = useGetOrdersQuery({
     page: 1,
     limit: 5,
-    sortBy: 'created',
-    sortOrder: 'DESC',
-    status: 'ALL',
+    sortBy: "created",
+    sortOrder: "DESC",
+    status: "ALL",
+    supplier: true,
   });
- 
-  const statistics = [
+  console.log("Overview Data:", orderListingData);
+
+  const allStatistics = [
     {
       title: "Total Orders",
       value: overviewData?.totalOrders,
@@ -40,7 +54,7 @@ const OverviewComponent = () => {
     },
     {
       title: "Total Sales",
-      value: overviewData?.totalSales ?? 0,
+      value: overviewData?.totalSales,
       icon: "dollar",
       growth: -4.3,
       positive: false,
@@ -61,105 +75,114 @@ const OverviewComponent = () => {
     },
   ];
 
+  // Filter to only show statistics where API returns a value
+  const statistics = allStatistics.filter(
+    (stat) => stat.value !== undefined && stat.value !== null
+  );
+
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
-    { title: "Name", dataIndex: "customer", key: "customer" },
-    { 
-      title: "Address", 
-      key: "address",
-      render: (_, record) => `${record.streetAddress}, ${record.appartmentNumber}, ${record.state}, ${record.zip}` 
+    {
+      title: "Name",
+      dataIndex: "customer",
+      key: "customer",
+      render: (_, record) =>
+        `${record?.customer?.firstName} ${record?.customer?.lastName}`,
     },
-    { title: "Date", dataIndex: "created", key: "created", render: (created) => new Date(created).toLocaleDateString() },
-    { title: "Type", dataIndex: "orderType", key: "orderType" },
+    {
+      title: "Address",
+      key: "address",
+      render: (_, record) =>
+        `${record?.shippingAddress?.streetAddress}, ${record?.shippingAddress?.apartmentNumber}, ${record?.shippingAddress?.state}, ${record?.shippingAddress?.zip}`,
+    },
+    {
+      title: "Date",
+      dataIndex: "created",
+      key: "created",
+      render: (created) => new Date(created).toLocaleDateString(),
+    },
+    {
+      title: "Type",
+      dataIndex: "orderType",
+      key: "orderType",
+      render: (_, record) =>
+        record?.orderItems[0]?.product?.category?.name
+          ? record?.orderItems[0]?.product?.category?.name
+          : "N/A",
+    },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Button
-          type={
-            status === "Completed"
-              ? "primary"
-              : status === "Rejected"
-              ? "danger"
-              : "default"
-          }
-        >
-          {status}
-        </Button>
-      ),
-    },
-  ];
+      render: (status) => {
+        const statusConfig = {
+          CANCEL: { color: "#FFE8E0", textColor: "#FF6B35", text: "Canceled" },
+          CANCELED: { color: "#FFE8E0", textColor: "#FF6B35", text: "Canceled" },
+          SHIPPED: { color: "#E0F2FF", textColor: "#0091FF", text: "Shipped" },
+          DELIVERED: { color: "#E0F9F4", textColor: "#00B894", text: "Completed" },
+          DILEVERED: { color: "#E0F9F4", textColor: "#00B894", text: "Completed" },
+          FULL_FILLED: { color: "#E0F9F4", textColor: "#00B894", text: "Completed" },
+          PROCESSING: { color: "#F3E5FF", textColor: "#9B59B6", text: "Processing" },
+          PENDING: { color: "#F5F5F5", textColor: "#595959", text: "Pending" },
+          DRAFT: { color: "#F5F5F5", textColor: "#595959", text: "Draft" },
+        };
 
-  const data = [
-    {
-      id: "00001",
-      name: "Christine Brooks",
-      address: "089 Kutch Green Apt. 448",
-      date: "04 Sep 2019",
-      type: "Electric",
-      status: "Completed",
-    },
-    {
-      id: "00002",
-      name: "Rosie Pearson",
-      address: "979 Immanuel Ferry Suite 526",
-      date: "28 May 2019",
-      type: "Book",
-      status: "Rejected",
-    },
-    {
-      id: "00003",
-      name: "Darrell Caldwell",
-      address: "8587 Frida Ports",
-      date: "23 Nov 2019",
-      type: "Medicine",
-      status: "Processing",
-    },
-    {
-      id: "00004",
-      name: "Gilbert Johnston",
-      address: "768 Destiny Lake Suite 600",
-      date: "05 Feb 2019",
-      type: "Mobile",
-      status: "Processing",
-    },
-    {
-      id: "00005",
-      name: "Alan Cain",
-      address: "042 Mylene Throughway",
-      date: "29 Jul 2019",
-      type: "Watch",
-      status: "Processing",
+        const config = statusConfig[status] || { color: "#F5F5F5", textColor: "#595959", text: status };
+
+        return (
+          <Tag
+            style={{
+              cursor: "pointer",
+              backgroundColor: config.color,
+              color: config.textColor,
+              border: "none",
+              fontWeight: 500,
+            }}
+          >
+            {config.text}
+          </Tag>
+        );
+      },
     },
   ];
+  const ImageTitle = {
+    "Total Orders": growthPng,
+    "Total Subscriptions": growthPng,
+    "Total Sales": graphPng,
+    "Pending Orders": timePng,
+    "Total User": usersPng,
+  };
+  const ImageWithTitle = ({ title }) => (
+    <Flex align="center" justify="space-between" gap="8px">
+      <span>{title}</span>
+      <img src={ImageTitle[title]} alt={title} style={{ height: 34 }} />
+    </Flex>
+  );
 
   return (
     <DashboardContainer>
       <StatisticContainer>
         <OverviewHeader>
           <OverviewHeading>Statistic Overview</OverviewHeading>
-          {/* <div>
-            <Select
-              defaultValue="lucy"
-              style={{ width: 120 }}
-              allowClear
-              options={[{ value: "lucy", label: "Lucy" }]}
-              placeholder="select it"
-            />
-          </div> */}
         </OverviewHeader>
-        <Row gutter={4}>
+        <Row gutter={[16, 16]}>
           {statistics.map((stat, index) => (
-            <Col span={4} key={index}>
+            <Col key={index} xs={24} sm={12} md={8} lg={6} xl={6}>
               <Card>
                 <Statistic
-                  title={stat.title}
+                  style={{
+                    maxHeight: "100px",
+                    height: "80px",
+                    overflow: "hidden",
+                  }}
+                  title={<ImageWithTitle title={stat.title} />}
                   value={stat.value}
-                  // precision={2}
+                  loading={isOverviewLoading}
                   valueStyle={{ color: stat.positive ? "#3f8600" : "#cf1322" }}
                   prefix={
-                    stat.positive ? <ArrowUpOutlined /> : <ArrowDownOutlined />
+                    <span style={{ display: "block" }}>
+                      {stat.positive ? <RiseOutlined /> : <RiseOutlined />}
+                    </span>
                   }
                   suffix="%"
                 />
@@ -169,12 +192,52 @@ const OverviewComponent = () => {
         </Row>
       </StatisticContainer>
       <TableContainer>
-        <h2>Recent Orders</h2>
+        <Flex
+          justify="space-between"
+          align="center"
+          style={{ marginBottom: "16px" }}
+        >
+          <h2>Recent Orders</h2>
+          <Button
+            style={{ marginBottom: "16px" }}
+            type="text"
+            onClick={() =>
+              navigate("/dashboard", { state: { selectedKey: "orders" } })
+            }
+          >
+            View All Orders
+          </Button>
+        </Flex>
         <Table
           columns={columns}
           dataSource={orderListingData?.results || []}
           loading={isOrdersLoading}
-          pagination={{ pageSize: 5 }}
+          onRow={(record) => ({
+            onClick: () => {
+              navigate("/dashboard", {
+                state: {
+                  selectedKey: "view_order",
+                  orderData: record
+                }
+              });
+            },
+            style: { cursor: "pointer" }
+          })}
+          pagination={
+            orderListingData?.total > 4
+              ? {
+                pageSize: 4,
+                showSizeChanger: false,
+                showTotal: false,
+                itemRender: (_, type, originalElement) => {
+                  if (type === "prev" || type === "next") {
+                    return originalElement;
+                  }
+                  return null;
+                },
+              }
+              : false
+          }
           rowKey="id"
         />
       </TableContainer>

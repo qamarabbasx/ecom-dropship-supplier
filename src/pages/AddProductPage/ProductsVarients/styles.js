@@ -8,6 +8,16 @@ export const MainContainer = styled.div`
 `;
 
 export const StyledButton = styled(AntButton)``;
+export const OrangeButton = styled(AntButton)`
+  background: #f88e48;
+  border-color: #f88e48;
+  color: #fff;
+  &:hover, &:focus {
+    background: #ef7a33;
+    border-color: #ef7a33;
+    color: #fff;
+  }
+`;
 
 export const StyledInput = styled(AntInput)`
   background: #fff;
@@ -64,6 +74,10 @@ export const OptionValues = styled.div`
     background-color: #f2f2f2;
     border-radius: 10px;
     border: 1px solid #f2f2f2;
+    display: inline-flex;
+    margin-right: 8px;
+    padding: 6px 10px;
+    gap: 6px;
   }
 `;
 
@@ -106,5 +120,29 @@ export const VariantsWrapper = styled.div`
 
   .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select:hover {
     border-color: #f88e48;
+  }
+
+  .variants-empty {
+    margin-top: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fff;
+  }
+
+  .variants-empty-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .variants-empty-row > div {
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 6px;
+    min-width: 80px;
+    text-align: left;
+    color: #6b7280;
+    font-size: 14px;
   }
 `;

@@ -46,12 +46,12 @@ export const columns = ({ editingUserId, onEditClick, onSaveClick, onCancelClick
       const status = record.subscription ? record.subscription.status : text;
       let color;
       let displayStatus = status;
-  
+
       // Check for 'Pending Approval' status
       if (status === "APPROVAL_PENDING") {
         color = "orange";
         displayStatus = "Pending Approval";
-      } else if (status === "ACVTIVE") {
+      } else if (status === "ACTIVE") {
         color = "green";
         displayStatus = "Active"
       } else if (!status) {
@@ -61,14 +61,14 @@ export const columns = ({ editingUserId, onEditClick, onSaveClick, onCancelClick
         color = "red";
         displayStatus = status;
       }
-  
+
       return editingUserId === record.id ? (
         <Select
           value={newStatus}
           onChange={setNewStatus}
           style={{ width: 120 }}
         >
-          <Select.Option value="ACVTIVE">Active</Select.Option>
+          <Select.Option value="ACTIVE">Active</Select.Option>
           <Select.Option value="APPROVAL_PENDING">Pending Approval</Select.Option>
         </Select>
       ) : (

@@ -1,23 +1,16 @@
 // import Layout from "layout";
 import React from "react";
-import { MainHeading, StyledBreadCrumbs } from "./styles";
+import { MainHeading } from "./styles";
 import ProductFrom from "./ProductForm";
 
-const items = [
-  {
-    title: <a href="">Added Product</a>,
-  },
-  {
-    title: <a href="">Add New Product</a>,
-  },
-];
-
-const AddProductPage = () => {
+const AddProductPage = ({ ProductData }) => {
   return (
     <>
       {/* <StyledBreadCrumbs items={items} /> */}
-      <MainHeading>{`Add New Product`}</MainHeading>
-      <ProductFrom />
+      <MainHeading>
+        {ProductData?.isEdit ? `Edit Product` : `Add New Product`}
+      </MainHeading>
+      <ProductFrom ProductData={ProductData} />
     </>
   );
 };

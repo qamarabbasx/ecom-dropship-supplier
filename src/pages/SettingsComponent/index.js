@@ -1,7 +1,20 @@
 import React, { useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
-import { Container, Section, Title, SaveButton } from "./styles";
-import { useGetUserProfileQuery } from "../../api/authApi";
+import {
+  Container,
+  Section,
+  Title,
+  SaveButton,
+  StatusRow,
+  StatusItem,
+  StatusLabel,
+  StatusValue,
+} from "./styles";
+import {
+  useGetUserProfileQuery,
+  useGetStripeConnectStatusQuery,
+  useCreateStripeConnectOnboardingLinkMutation,
+} from "../../api/authApi";
 import { useChangePasswordMutation } from "../../api/authApi";
 import { useUpdateUserMutation } from "../../api/authApi";
 
@@ -14,6 +27,19 @@ const ProfileSettings = () => {
     useChangePasswordMutation();
 
   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
+  const {
+    data: connectStatus,
+    refetch: refetchConnectStatus,
+    isFetching: isFetchingConnectStatus,
+  } = useGetStripeConnectStatusQuery(undefined, {
+    skip: !["SUPPLIER", "ADMIN", "SUPER_ADMIN"].includes(userProfile?.role),
+  });
+  const [createOnboardingLink, { isLoading: isCreatingOnboardingLink }] =
+    useCreateStripeConnectOnboardingLinkMutation();
+
+  const isConnectSectionVisible = ["SUPPLIER", "ADMIN", "SUPER_ADMIN"].includes(
+    userProfile?.role
+  );
 
   const handleProfileSave = async (values) => {
     console.log("Profile Information:", values);
@@ -65,6 +91,30 @@ const ProfileSettings = () => {
       });
     }
   }, [userProfile, error, profileForm]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const stripeConnectStatus = params.get("stripe_connect");
+    if (stripeConnectStatus === "success") {
+      message.success("Stripe Connect onboarding completed.");
+      refetchConnectStatus();
+    } else if (stripeConnectStatus === "refresh") {
+      message.info("Please continue Stripe Connect onboarding.");
+    }
+  }, [refetchConnectStatus]);
+
+  const handleConnectOnboarding = async () => {
+    try {
+      const response = await createOnboardingLink().unwrap();
+      if (!response?.onboardingUrl) {
+        message.error("Unable to get Stripe onboarding link");
+        return;
+      }
+      window.location.href = response.onboardingUrl;
+    } catch (err) {
+      message.error(err?.data?.message || "Failed to start Stripe onboarding");
+    }
+  };
 
   return (
     <Container>
@@ -157,6 +207,49 @@ const ProfileSettings = () => {
           </Form.Item>
         </Form>
       </Section>
+
+      {isConnectSectionVisible && (
+        <Section>
+          <Title>Stripe Connect</Title>
+          <StatusRow>
+            <StatusItem>
+              <StatusLabel>Connected Account</StatusLabel>
+              <StatusValue>
+                {connectStatus?.isConnected ? "Connected" : "Not connected"}
+              </StatusValue>
+            </StatusItem>
+            <StatusItem>
+              <StatusLabel>Onboarding Submitted</StatusLabel>
+              <StatusValue>
+                {connectStatus?.detailsSubmitted ? "Yes" : "No"}
+              </StatusValue>
+            </StatusItem>
+            <StatusItem>
+              <StatusLabel>Charges Enabled</StatusLabel>
+              <StatusValue>
+                {connectStatus?.chargesEnabled ? "Yes" : "No"}
+              </StatusValue>
+            </StatusItem>
+            <StatusItem>
+              <StatusLabel>Payouts Enabled</StatusLabel>
+              <StatusValue>
+                {connectStatus?.payoutsEnabled ? "Yes" : "No"}
+              </StatusValue>
+            </StatusItem>
+          </StatusRow>
+          <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+            <Button onClick={refetchConnectStatus} loading={isFetchingConnectStatus}>
+              Refresh Status
+            </Button>
+            <SaveButton
+              onClick={handleConnectOnboarding}
+              loading={isCreatingOnboardingLink}
+            >
+              {connectStatus?.isConnected ? "Update Stripe Connect" : "Connect Stripe"}
+            </SaveButton>
+          </div>
+        </Section>
+      )}
     </Container>
   );
 };

@@ -1,26 +1,79 @@
 import React, { useState, useEffect } from "react";
 import { Table, Spin, message } from "antd";
-import columns from "./columns";
+import getColumns from "./columns";
 import { TableWrapper } from "./styles";
-import { useGetOrdersQuery } from "../../../api/authApi";
+import {
+  useGetOrdersQuery,
+  useUpdateOrderStatusMutation,
+  useDeleteOrderMutation,
+} from "../../../api/authApi";
 
-const OrdersListing = ({ searchFilter, selectedDate }) => {
+const OrdersListing = ({
+  searchFilter,
+  startDate,
+  endDate,
+  appliedFilters,
+  onEditOrder,
+  onViewOrder,
+  onDataChange,
+}) => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [sortBy, setSortBy] = useState("order.created");
   const [sortOrder, setSortOrder] = useState("DESC");
-  const [supplier] = useState(false);
+  const [supplier] = useState(true);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
+  const [updateOrderStatus] = useUpdateOrderStatusMutation();
+  const [deleteOrder] = useDeleteOrderMutation();
 
-  const { data: orderListingData, error, isLoading } = useGetOrdersQuery({ 
-    page, 
-    limit, 
-    sortBy, 
+  const columns = getColumns(
+    onEditOrder,
+    onViewOrder,
+    updateOrderStatus,
+    deleteOrder
+  );
+
+  // Build query parameters with filters
+  const queryParams = {
+    page,
+    limit,
+    sortBy,
     sortOrder,
     supplier,
-    startDate: selectedDate,
-    searchFilter
-  });
+    searchFilter,
+  };
+
+  // Add date filters if they exist
+  if (startDate) {
+    queryParams.startDate = startDate;
+  }
+  if (endDate) {
+    queryParams.endDate = endDate;
+  }
+
+  // Add filter parameters if they exist
+  if (appliedFilters?.status && appliedFilters.status !== "All") {
+    queryParams.status = appliedFilters.status.toUpperCase();
+  }
+  if (appliedFilters?.orderType && appliedFilters.orderType.length > 0) {
+    queryParams.orderType = appliedFilters.orderType.join(",");
+  }
+  if (appliedFilters?.customer && appliedFilters.customer.length > 0) {
+    queryParams.customer = appliedFilters.customer.join(",");
+  }
+
+  const {
+    data: orderListingData,
+    error,
+    isLoading,
+  } = useGetOrdersQuery(queryParams);
+
+  useEffect(() => {
+    if (orderListingData?.results && onDataChange) {
+      onDataChange(orderListingData.results);
+    }
+  }, [orderListingData, onDataChange]);
 
   const handleTableChange = (pagination, filters, sorter) => {
     const { field, order } = sorter;
@@ -29,81 +82,12 @@ const OrdersListing = ({ searchFilter, selectedDate }) => {
     setPage(pagination.current);
   };
 
-
-  const data1 = [
-    {
-      key: "1",
-      orderId: "1784",
-      orderNumber: "302012",
-      orderType: "Home Delivery",
-      items: 2,
-      customerName: "Wade Warren",
-      status: "Canceled",
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedKeys) => {
+      setSelectedRowKeys(selectedKeys);
     },
-    {
-      key: "2",
-      orderId: "1374",
-      orderNumber: "302012",
-      orderType: "Pick Up",
-      items: 3,
-      customerName: "Cameron Williamson",
-      status: "Completed",
-    },
-    {
-      key: "3",
-      orderId: "4152",
-      orderNumber: "302012",
-      orderType: "Home Delivery",
-      items: 4,
-      customerName: "Ralph Edwards",
-      status: "Pending",
-    },
-    {
-      key: "4",
-      orderId: "8013",
-      orderNumber: "302012",
-      orderType: "Home Delivery",
-      items: 2,
-      customerName: "Eleanor Pena",
-      status: "Shipped",
-    },
-    {
-      key: "5",
-      orderId: "8861",
-      orderNumber: "302012",
-      orderType: "Pick Up",
-      items: 0,
-      customerName: "Devon Lane",
-      status: "Completed",
-    },
-    {
-      key: "6",
-      orderId: "3536",
-      orderNumber: "302012",
-      orderType: "Pick Up",
-      items: 1,
-      customerName: "Brooklyn Simmons",
-      status: "Pending",
-    },
-    {
-      key: "7",
-      orderId: "9151",
-      orderNumber: "302012",
-      orderType: "Pick Up",
-      items: 5,
-      customerName: "Cody Fisher",
-      status: "Draft",
-    },
-    {
-      key: "8",
-      orderId: "4349",
-      orderNumber: "302012",
-      orderType: "Pick Up",
-      items: 3,
-      customerName: "Jacob Jones",
-      status: "Draft",
-    },
-  ];
+  };
 
   useEffect(() => {
     if (error) {
@@ -114,9 +98,12 @@ const OrdersListing = ({ searchFilter, selectedDate }) => {
   return (
     <TableWrapper>
       {isLoading ? (
-        <Spin size="large" />
+        <div className="loading-wrapper">
+          <Spin size="large" />
+        </div>
       ) : (
         <Table
+          rowSelection={rowSelection}
           columns={columns}
           dataSource={orderListingData?.results || []}
           rowKey="id"
@@ -127,10 +114,15 @@ const OrdersListing = ({ searchFilter, selectedDate }) => {
             pageSize: limit,
             total: orderListingData?.total || 0,
             onChange: (newPage) => setPage(newPage),
-            showTotal: (total) => `Total ${total} items`,
-          }}
-          rowSelection={{
-            type: "checkbox",
+            showSizeChanger: false,
+            showTotal: (total, range) =>
+              `Showing ${range[0]}-${range[1]} of ${total}`,
+            itemRender: (_, type, originalElement) => {
+              if (type === "prev" || type === "next") {
+                return originalElement;
+              }
+              return null;
+            },
           }}
         />
       )}

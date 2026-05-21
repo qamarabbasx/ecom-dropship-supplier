@@ -87,6 +87,14 @@ export const ProductMetaData = styled.div`
 `;
 
 export const StyledSaveButton = styled(AntButton)`
-  padding: 30px 100px;
+  padding: 14px 36px;
   margin-top: 40px;
+  background: #f88e48;
+  border-color: #f88e48;
+  color: #fff;
+  &:hover, &:focus {
+    background: #ef7a33;
+    border-color: #ef7a33;
+    color: #fff;
+  }
 `;

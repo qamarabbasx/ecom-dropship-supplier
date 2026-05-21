@@ -6,11 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import Login from "./pages/Login/Login";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import AddProductPage from "./pages/AddProductPage";
-import UserForm from "./pages/UsersComponent/UserForm";
 
 function App() {
   return (
@@ -21,6 +22,22 @@ function App() {
           element={
             <PublicRoute>
               <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <PublicRoute>
+              <ResetPassword />
             </PublicRoute>
           }
         />
@@ -37,14 +54,6 @@ function App() {
           element={
             <PrivateRoute>
               <AddProductPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/add_user"
-          element={
-            <PrivateRoute>
-              <UserForm />
             </PrivateRoute>
           }
         />

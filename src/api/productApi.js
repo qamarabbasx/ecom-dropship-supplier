@@ -26,6 +26,16 @@ export const productApi = createApi({
         body,
       }),
     }),
+    editProduct: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `products/edit/${id}`,
+        method: "PUT",
+        body: formData,
+      }),
+    }),
+    getCategories: builder.query({
+      query: () => "categories",
+    }),
     getProducts: builder.query({
       query: (type) => `products/public?badge=TICK_TOK_VERIFIED&type=${type}`,
     }),
@@ -40,6 +50,8 @@ export const productApi = createApi({
 
 export const {
   useAddProductMutation,
+  useEditProductMutation,
+  useGetCategoriesQuery,
   useGetProductsQuery,
   useGetProductDetailQuery,
   useGetSupplierProductsQuery,

@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import image from "../../assets/Icons/image.png";
 import { Image, message } from "antd";
 
-const UploadImages = ({ handleProductImages }) => {
+const UploadImages = ({ handleProductImages, existingImages = [] }) => {
   const [fileList, setFileList] = useState([]);
+  const [existingFileList, setExistingFileList] = useState([]);
   const inputRef = useRef();
   const replaceInputRef = useRef();
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -13,6 +14,19 @@ const UploadImages = ({ handleProductImages }) => {
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
   const ALLOWED_FILE_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
   const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'];
+
+  // Initialize with existing images when in edit mode
+  useEffect(() => {
+    if (existingImages && existingImages.length > 0) {
+      const formattedImages = existingImages.map((img, index) => ({
+        uid: img.id || `existing-${index}`,
+        name: img.s3Key || `image-${index}`,
+        url: img.url,
+        isExisting: true,
+      }));
+      setExistingFileList(formattedImages);
+    }
+  }, [existingImages]);
 
   const validateFile = (file) => {
     // Check file type
@@ -64,10 +78,10 @@ const UploadImages = ({ handleProductImages }) => {
       originFileObj: file,
     }));
 
-    const updatedList = [...fileList, ...newFiles].slice(0, 8);
+    const updatedList = [...fileList, ...newFiles].slice(0, 8 - existingFileList.length);
 
-    if (fileList.length + uniqueNewFiles.length > 8) {
-      message.warning(`Only 8 images can be uploaded. ${fileList.length + uniqueNewFiles.length - 8} file(s) were not added.`);
+    if (fileList.length + uniqueNewFiles.length > 8 - existingFileList.length) {
+      message.warning(`Only 8 images can be uploaded. ${fileList.length + uniqueNewFiles.length - (8 - existingFileList.length)} file(s) were not added.`);
     }
 
     setFileList(updatedList);
@@ -88,6 +102,12 @@ const UploadImages = ({ handleProductImages }) => {
     const updatedList = fileList.filter((file) => file.uid !== uid);
     setFileList(updatedList);
     handleProductImages(updatedList.map((f) => f.originFileObj));
+  };
+
+  const handleRemoveExisting = (uid) => {
+    const updatedList = existingFileList.filter((file) => file.uid !== uid);
+    setExistingFileList(updatedList);
+    message.info("Existing image will be removed on save");
   };
 
   const handleReplace = (uid) => {
@@ -152,7 +172,7 @@ const UploadImages = ({ handleProductImages }) => {
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
-        {fileList.length < 8 && (
+        {fileList.length + existingFileList.length < 8 && (
           <div
             style={{
               width: 192,
@@ -190,6 +210,66 @@ const UploadImages = ({ handleProductImages }) => {
             />
           </div>
         )}
+        {existingFileList.map((file) => (
+          <div
+            key={file.uid}
+            style={{
+              width: 120,
+              height: 120,
+              borderRadius: 8,
+              overflow: "hidden",
+              position: "relative",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              background: "#f5f5f5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <img
+              src={file.url}
+              alt={file.name}
+              style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "pointer" }}
+              onClick={() => handlePreview(file)}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(0,0,0,0.35)",
+                opacity: 0,
+                transition: "opacity 0.2s",
+                zIndex: 2,
+                pointerEvents: "none",
+              }}
+              className="upload-image-overlay"
+            >
+              <button
+                style={{
+                  background: "#fff",
+                  border: "none",
+                  borderRadius: 4,
+                  padding: "4px 12px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  pointerEvents: "auto",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemoveExisting(file.uid);
+                }}
+              >Remove</button>
+            </div>
+          </div>
+        ))}
         {fileList.map((file) => (
           <div
             key={file.uid}

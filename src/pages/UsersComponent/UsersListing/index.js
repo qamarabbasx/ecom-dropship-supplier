@@ -48,7 +48,7 @@ const UsersListing = ({ searchFilter }) => {
 
   console.log('\n\n userData \n\n', userData);
 
-  const [updateUserRoleAndStatus, { isLoading: isUpdating }] = useUpdateUserRoleAndStatusMutation();  
+  const [updateUserRoleAndStatus, { isLoading: isUpdating }] = useUpdateUserRoleAndStatusMutation();
 
   const handleTableChange = (pagination) => {
     setPage(pagination.current);
@@ -110,9 +110,19 @@ const UsersListing = ({ searchFilter }) => {
         pagination={{
           current: page,
           pageSize: limit,
-          position: ["bottomRight"],
-          total: userData?.total | 0,
-          showTotal: (total) => `Total ${total} Users`,
+          total: userData?.total || 0,
+          onChange: (newPage, newPageSize) => {
+            setPage(newPage);
+            setLimit(newPageSize);
+          },
+          showSizeChanger: false,
+          showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total}`,
+          itemRender: (_, type, originalElement) => {
+            if (type === "prev" || type === "next") {
+              return originalElement;
+            }
+            return null;
+          },
         }}
       />
     </StyledTableContainer>

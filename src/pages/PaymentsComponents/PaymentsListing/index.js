@@ -1,97 +1,103 @@
 // TableComponent.js
-import React, { useState} from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Spin, message } from "antd";
 import { StyledTableWrapper } from "./styles";
 import { columns } from "./columns";
 import { useGetInvoicesQuery } from "../../../api/authApi";
+import { useNavigate } from "react-router-dom";
 
-const data = [
-  {
-    key: "1",
-    invoiceId: "00001",
-    orderNumber: 877,
-    recipientName: "Savannah Nguyen",
-    amount: "$42,000",
-    date: "04 Sep 2019",
-    type: "Incoming",
-    status: "Completed",
-  },
-  {
-    key: "2",
-    invoiceId: "00002",
-    orderNumber: 740,
-    recipientName: "Brooklyn Simmons",
-    amount: "$17,000",
-    date: "28 May 2019",
-    type: "Outgoing",
-    status: "Rejected",
-  },
-  {
-    key: "3",
-    invoiceId: "00003",
-    orderNumber: 536,
-    recipientName: "Darlene Robertson",
-    amount: "$57,000",
-    date: "23 Nov 2019",
-    type: "Incoming",
-    status: "Processing",
-  },
-];
-
-const PaymentsListing = ({ searchFilter, statusFilter }) => {
+const PaymentsListing = ({ searchFilter, statusFilter, dateFilter }) => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [sortBy] = useState("created");
   const [sortOrder] = useState("DESC");
 
-  const { data: orderListingData, error, isLoading } = useGetInvoicesQuery({
+  const { data: orderListingData, error, isLoading, refetch } = useGetInvoicesQuery({
     page,
     limit,
     sortBy,
     sortOrder,
     searchFilter,
-    status: statusFilter
+    status: statusFilter !== "ALL" ? statusFilter : undefined,
   });
 
-  if (error) {
-    message.error("Failed to load invoices");
-  }
+  useEffect(() => {
+    refetch();
+  }, [searchFilter, statusFilter, dateFilter, refetch]);
 
-  const data = orderListingData?.invoices.map((invoice) => ({
-    key: invoice.id,
-    invoiceId: invoice.id,
-    orderNumber: invoice.order.id,
-    recipientName: `${invoice.customer.firstName} ${invoice.customer.lastName}`,
-    amount: `$${invoice.order.amount}`,
-    date: new Date(invoice.created).toLocaleDateString(),
-    type: invoice.type,
-    status: invoice.status,
-  })) || [];
+  useEffect(() => {
+    if (error) {
+      message.error("Failed to load invoices");
+    }
+  }, [error]);
+
+  const data =
+    orderListingData?.invoices?.map((invoice) => ({
+      key: invoice.id,
+      invoiceId: invoice.invoiceNumber || invoice.id,
+      orderNumber: invoice.order?.orderNumber || invoice.order?.id || "N/A",
+      recipientName: invoice.customer
+        ? `${invoice.customer.firstName || ""} ${invoice.customer.lastName || ""}`.trim()
+        : "N/A",
+      amount: invoice.order?.amount
+        ? `$${parseFloat(invoice.order.amount).toFixed(2)}`
+        : "$0.00",
+      date: invoice.created
+        ? new Date(invoice.created).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        })
+        : "N/A",
+      type: invoice.type || "Incoming",
+      status: invoice.status || "Processing",
+    })) || [];
+
+  const handleRowClick = (record) => {
+    navigate("/dashboard", {
+      state: {
+        selectedKey: "view_invoice",
+        invoiceId: record.key,
+      },
+    });
+  };
 
   return (
     <StyledTableWrapper>
-    {isLoading ? (
-      <Spin size="large" />
-    ) : (
-      <Table
-        columns={columns}
-        dataSource={data}
-        pagination={{
-          current: page,
-          pageSize: limit,
-          total: orderListingData?.total || 0,
-          onChange: (newPage, newLimit) => {
-            setPage(newPage);
-            setLimit(newLimit);
-          },
-          showTotal: (total) => `Total ${total} items`,
-        }}
-        rowSelection={{
-          type: "checkbox",
-        }}
-      />
-    )}
-  </StyledTableWrapper>
+      {isLoading ? (
+        <div className="loading-wrapper">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={data}
+          pagination={{
+            current: page,
+            pageSize: limit,
+            total: orderListingData?.total || 0,
+            onChange: (newPage, newLimit) => {
+              setPage(newPage);
+              setLimit(newLimit);
+            },
+            showSizeChanger: false,
+            showTotal: (total, range) => `Showing ${range[0]}-${range[1]} of ${total}`,
+            itemRender: (_, type, originalElement) => {
+              if (type === "prev" || type === "next") {
+                return originalElement;
+              }
+              return null;
+            },
+          }}
+          onRow={(record) => ({
+            onClick: () => handleRowClick(record),
+            style: { cursor: "pointer" },
+          })}
+          scroll={{ x: "max-content" }}
+        />
+      )}
+    </StyledTableWrapper>
   );
 };
 

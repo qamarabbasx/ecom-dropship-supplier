@@ -21,7 +21,14 @@ export const ProductsHeader = styled.div`
 `;
 
 export const StyledButton = styled(AntButton)`
-  font-size: 18px;
-  height: 50px;
-  padding: 4px 40px;
+  font-size: 14px;
+  height: 40px;
+  padding: 4px 24px;
+  background: #ff6b35;
+  border-color: #ff6b35;
+  
+  &:hover {
+    background: #ff8555 !important;
+    border-color: #ff8555 !important;
+  }
 `;

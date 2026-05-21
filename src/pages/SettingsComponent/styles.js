@@ -40,3 +40,29 @@ export const SaveButton = styled(Button)`
     background-color: #fa8c16;
   }
 `;
+
+export const StatusRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+export const StatusItem = styled.div`
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 12px;
+`;
+
+export const StatusLabel = styled.div`
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-bottom: 4px;
+`;
+
+export const StatusValue = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f1f1f;
+`;

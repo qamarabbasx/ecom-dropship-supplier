@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const authApi = createApi({
   reducerPath: "authApi",
+  tagTypes: ["Orders", "Warehouses"],
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_BASE_URL || "https://backend.ecomdropship.ai/", //"http://localhost:8000/",
     credentials: "include",
@@ -22,6 +23,20 @@ export const authApi = createApi({
         body: credentials,
       }),
     }),
+    forgotPassword: builder.mutation({
+      query: (email) => ({
+        url: "auth/forgot-password",
+        method: "POST",
+        body: email,
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: ({ token, newPassword }) => ({
+        url: `auth/reset-password/${token}`,
+        method: "POST",
+        body: { newPassword },
+      }),
+    }),
     getOverview: builder.query({
       query: () => ({
         url: "dashboard/overview",
@@ -33,13 +48,25 @@ export const authApi = createApi({
         searchFilter,
         sortBy,
         sortOrder,
-        selectedDate,
+        startDate,
+        endDate,
         page,
         limit,
+        status,
+        owner,
       }) => {
         const params = { search: searchFilter, sortBy, sortOrder, page, limit };
-        if (selectedDate) {
-          params.date = selectedDate;
+        if (startDate) {
+          params.startDate = startDate;
+        }
+        if (endDate) {
+          params.endDate = endDate;
+        }
+        if (status) {
+          params.status = status;
+        }
+        if (owner) {
+          params.owner = owner;
         }
         return {
           url: "products/user-products",
@@ -73,6 +100,13 @@ export const authApi = createApi({
         },
       }),
     }),
+    getInvoiceById: builder.query({
+      query: (invoiceId) => ({
+        url: `invoices/${invoiceId}`,
+        method: "GET",
+      }),
+      providesTags: ["Invoices"],
+    }),
     getOrders: builder.query({
       query: ({
         page = 1,
@@ -83,6 +117,9 @@ export const authApi = createApi({
         endDate,
         searchFilter,
         supplier = false,
+        status,
+        orderType,
+        customer,
       }) => {
         const params = {
           page,
@@ -95,12 +132,25 @@ export const authApi = createApi({
         if (startDate) {
           params.startDate = startDate;
         }
+        if (endDate) {
+          params.endDate = endDate;
+        }
+        if (status) {
+          params.status = status;
+        }
+        if (orderType) {
+          params.orderType = orderType;
+        }
+        if (customer) {
+          params.customer = customer;
+        }
         return {
           url: "orders",
           method: "GET",
           params,
         };
       },
+      providesTags: ["Orders"],
     }),
     getUserProfile: builder.query({
       query: () => ({
@@ -161,14 +211,141 @@ export const authApi = createApi({
         body: { userId, newRole, newStatus },
       }),
     }),
+    deleteProducts: builder.mutation({
+      query: (productIds) => ({
+        url: "products",
+        method: "DELETE",
+        body: { products: productIds },
+      }),
+    }),
+    getProductById: builder.query({
+      query: (id) => ({
+        url: `products/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateOrderStatus: builder.mutation({
+      query: ({ orderId, status }) => ({
+        url: `orders/${orderId}`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    deleteOrder: builder.mutation({
+      query: (orderId) => ({
+        url: `orders/${orderId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    getOrderById: builder.query({
+      query: (orderId) => ({
+        url: `orders/${orderId}`,
+        method: "GET",
+      }),
+      providesTags: ["Orders"],
+    }),
+    getCustomers: builder.query({
+      query: () => ({
+        url: "orders/customers",
+        method: "GET",
+      }),
+    }),
+    getProductOwners: builder.query({
+      query: () => ({
+        url: "products/owners",
+        method: "GET",
+      }),
+    }),
+    getWarehouses: builder.query({
+      query: ({
+        page = 1,
+        limit = 10,
+        sortBy = "created",
+        sortOrder = "DESC",
+        searchFilter,
+      }) => {
+        const params = {
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+        };
+        if (searchFilter) {
+          params.searchFilter = searchFilter;
+        }
+        return {
+          url: "ware-house/list",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: ["Warehouses"],
+    }),
+    getWareHouseManagers: builder.query({
+      query: ({
+        page = 1,
+        limit = 10,
+        sortBy = "firstName",
+        sortOrder = "ASC",
+        searchFilter,
+      }) => {
+        const params = {
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+        };
+        if (searchFilter) {
+          params.searchFilter = searchFilter;
+        }
+        return {
+          url: "ware-house/managers/list",
+          method: "GET",
+          params,
+        };
+      },
+    }),
+    createWareHouse: builder.mutation({
+      query: (warehouseData) => ({
+        url: "ware-house/create",
+        method: "POST",
+        body: warehouseData,
+      }),
+      invalidatesTags: ["Warehouses"],
+    }),
+    updateWareHouseManager: builder.mutation({
+      query: ({ warehouseId, managerId }) => ({
+        url: `ware-house/${warehouseId}/manager`,
+        method: "PUT",
+        body: { managerId },
+      }),
+      invalidatesTags: ["Warehouses"],
+    }),
+    getStripeConnectStatus: builder.query({
+      query: () => ({
+        url: "payments/connect/supplier/status",
+        method: "GET",
+      }),
+    }),
+    createStripeConnectOnboardingLink: builder.mutation({
+      query: () => ({
+        url: "payments/connect/supplier/onboarding",
+        method: "POST",
+      }),
+    }),
   }),
 });
 
 export const {
   useLoginMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
   useGetOverviewQuery,
   useGetUserProductsQuery,
   useGetInvoicesQuery,
+  useGetInvoiceByIdQuery,
   useGetUserProfileQuery,
   useChangePasswordMutation,
   useGetOrdersQuery,
@@ -177,4 +354,17 @@ export const {
   useLogoutMutation,
   useCreateUserMutation,
   useUpdateUserRoleAndStatusMutation,
+  useDeleteProductsMutation,
+  useGetProductByIdQuery,
+  useUpdateOrderStatusMutation,
+  useDeleteOrderMutation,
+  useGetOrderByIdQuery,
+  useGetCustomersQuery,
+  useGetProductOwnersQuery,
+  useGetWarehousesQuery,
+  useGetWareHouseManagersQuery,
+  useCreateWareHouseMutation,
+  useUpdateWareHouseManagerMutation,
+  useGetStripeConnectStatusQuery,
+  useCreateStripeConnectOnboardingLinkMutation,
 } = authApi;

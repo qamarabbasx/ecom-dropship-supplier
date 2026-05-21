@@ -10,7 +10,7 @@ import { message } from "antd";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [login, { isLoading, isError, error }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -28,14 +28,19 @@ const Login = () => {
         message.error("Unauthorized user role");
       }
     } catch (err) {
-      console.log('\n\n err \n\n', err);
+      console.log("\n\n err \n\n", err);
       message.error("Login failed: " + (err.data?.message || err.message));
     }
   };
 
   const handleForgotPassword = (e) => {
     e.preventDefault();
-    message.info("Coming soon...");
+    navigate("/forgot-password");
+  };
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
   };
 
   return (
@@ -64,8 +69,10 @@ const Login = () => {
               <label>Email</label>
               <input
                 type="text"
+                style={{ width: "100%" }}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                onKeyDown={handleKeyPress}
                 className={styles.loginInput}
               />
             </div>
@@ -74,12 +81,16 @@ const Login = () => {
               <input
                 type="password"
                 value={password}
+                style={{ width: "100%" }}
+                onKeyDown={handleKeyPress}
                 onChange={(e) => setPassword(e.target.value)}
                 className={styles.loginInput}
               />
             </div>
             <div className={styles.btnWrapper}>
-              <a href="#" onClick={handleForgotPassword}>Forgot Password?</a>
+              <a href="#" onClick={handleForgotPassword}>
+                Forgot Password?
+              </a>
               <button
                 onClick={handleLogin}
                 className={`${styles.loginButton} mt-20`}

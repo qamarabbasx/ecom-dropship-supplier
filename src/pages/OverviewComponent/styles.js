@@ -6,8 +6,9 @@ export const DashboardContainer = styled.div`
 
 export const StatisticContainer = styled.div`
   margin-bottom: 20px;
-  .ant-row {
-    justify-content: space-between;
+  .ant-col {
+    flex: 1 1 0;
+    max-width: none;
   }
 `;
 
@@ -16,6 +17,17 @@ export const TableContainer = styled.div`
   h2 {
     font-size: 20px;
     margin-bottom: 10px;
+  }
+  /* Horizontal scroll for mobile */
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    .ant-table {
+      min-width: 600px;
+      width: max-content;
+      overflow-x: auto;
+      display: block;
+    }
   }
   .ant-table {
     background: #fff;
@@ -29,7 +41,7 @@ export const TableContainer = styled.div`
 
 export const OverviewHeader = styled.div`
   margin-top: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;

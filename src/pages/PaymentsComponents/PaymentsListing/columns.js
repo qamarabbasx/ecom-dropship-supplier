@@ -1,63 +1,85 @@
 // Columns.js
+import { Tag } from "antd";
+
 export const columns = [
   {
     title: "ID Invoice",
     dataIndex: "invoiceId",
     key: "invoiceId",
+    width: 120,
   },
   {
-    title: "Order Number",
+    title: "Oder Number",
     dataIndex: "orderNumber",
     key: "orderNumber",
+    width: 130,
   },
   {
     title: "Recipient Name",
     dataIndex: "recipientName",
     key: "recipientName",
+    width: 180,
   },
   {
     title: "Amount",
     dataIndex: "amount",
     key: "amount",
+    width: 120,
+    render: (amount) => (
+      <span style={{ fontWeight: 500 }}>{amount}</span>
+    ),
   },
   {
     title: "Date",
     dataIndex: "date",
     key: "date",
+    width: 130,
   },
   {
-    title: "Type",
+    title: "TYPE",
     dataIndex: "type",
     key: "type",
+    width: 120,
+    render: (type) => (
+      <span style={{ textTransform: "capitalize" }}>{type}</span>
+    ),
   },
   {
-    title: "Status",
+    title: "STATUS",
     dataIndex: "status",
     key: "status",
+    width: 130,
     render: (status) => {
       let color;
-      switch (status) {
-        case "Completed":
+      switch (status?.toLowerCase()) {
+        case "completed":
+        case "approved":
           color = "#52c41a";
           break;
-        case "Rejected":
-          color = "#f5222d";
+        case "rejected":
+        case "failed":
+        case "cancelled":
+          color = "#ff4d4f";
           break;
-        case "Processing":
+        case "pending":
+          color = "#faad14";
+          break;
+        case "processing":
         default:
-          color = "#d9d9d9";
+          color = "#8c8c8c";
       }
       return (
-        <span
+        <Tag
+          color={color}
           style={{
-            backgroundColor: color,
-            padding: "5px 10px",
-            borderRadius: "15px",
-            color: "#fff",
+            borderRadius: "12px",
+            padding: "2px 12px",
+            fontWeight: 500,
+            textTransform: "capitalize",
           }}
         >
           {status}
-        </span>
+        </Tag>
       );
     },
   },

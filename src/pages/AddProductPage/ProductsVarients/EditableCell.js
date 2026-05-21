@@ -15,31 +15,34 @@ const EditableCell = ({
   let childNode = children;
 
   if (editable && editing) {
-    childNode =
-      dataIndex === "price" || dataIndex === "totalStock" ? (
+    if (dataIndex === "price" || dataIndex === "totalStock") {
+      childNode = (
         <Form.Item
           style={{ margin: 0 }}
           name={dataIndex}
-          rules={[{ required: true, message: `${title} is required.` }]}
+          rules={[{ required: true, message: title + ' is required.' }]}
         >
-          <InputNumber 
-            min={0} 
-            step={1} 
-            autoFocus 
-            style={{ width: "100%" }}
-            formatter={(value) => dataIndex === "price" ? `$ ${value}` : value}
+          <InputNumber
+            min={0}
+            step={dataIndex === "price" ? 0.01 : 1}
+            autoFocus
+            style={{ width: "60px" }}
+            formatter={(value) => dataIndex === "price" ? `$${Number(value ?? 0).toFixed(2)}` : value}
             parser={(value) => dataIndex === "price" ? value.replace(/\$\s?/g, '') : value}
           />
         </Form.Item>
-      ) : (
+      );
+    } else {
+      childNode = (
         <Form.Item
           style={{ margin: 0 }}
           name={dataIndex}
-          rules={[{ required: true, message: `${title} is required.` }]}
+          rules={[{ required: true, message: title + ' is required.' }]}
         >
-          <Input autoFocus />
+          <Input autoFocus style={{ width: "60px" }} />
         </Form.Item>
       );
+    }
   } else {
     childNode = (
       <div

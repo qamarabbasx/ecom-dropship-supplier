@@ -3,13 +3,11 @@ import React from "react";
 import { Form, Input, Select, Button, message } from "antd";
 import { UserFormWrapper, StyledButton } from "./styles";
 import { useCreateUserMutation } from "../../../api/authApi";
-import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
-const UserForm = () => {
+const UserForm = ({ onUserAdded }) => {
   const [form] = Form.useForm();
   const [createUser, { isLoading }] = useCreateUserMutation();
-  const navigate = useNavigate();
 
   const onFinish = async (values) => {
     try {
@@ -17,7 +15,10 @@ const UserForm = () => {
       const { confirmPassword, ...userData } = values;
       await createUser(userData).unwrap();
       message.success("User created successfully");
-      navigate("/dashboard");
+      form.resetFields();
+      if (onUserAdded) {
+        onUserAdded();
+      }
     } catch (err) {
       message.error(err.data?.message || "Failed to create user");
     }
@@ -81,7 +82,7 @@ const UserForm = () => {
         >
           <Input.Password placeholder="Confirm Password" />
         </Form.Item>
-        <StyledButton type="primary" htmlType="submit">
+        <StyledButton type="primary" htmlType="submit" loading={isLoading}>
           Add User
         </StyledButton>
       </Form>

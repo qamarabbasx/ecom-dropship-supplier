@@ -3,11 +3,10 @@ import { MainContainer, MainHeading, ProductsHeader } from "./styles";
 import { Input } from "antd";
 import UsersListing from "./UsersListing";
 import AntButton from "../../uiKits/Button";
-import { useNavigate } from "react-router-dom";
 const { Search } = Input;
 
 const onSearch = (value, _e, info) => console.log(info?.source, value);
-const UsersComponent = () => {
+const UsersComponent = ({ onAddUser }) => {
   const [searchFilter, setSearchFilter] = useState("");
   const handleSearch = (event) => {
     const value = event.target.value;
@@ -17,9 +16,10 @@ const UsersComponent = () => {
       setSearchFilter("");
     }
   };
-  const navigate = useNavigate();
   const goToForm = () => {
-    navigate("/add_user"); // Redirects to the UserForm component
+    if (onAddUser) {
+      onAddUser();
+    }
   };
   return (
     <MainContainer>

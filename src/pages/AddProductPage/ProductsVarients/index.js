@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Table, Form, message, Spin } from "antd";
+import React, { useEffect, useState } from "react";
+import { Table, Form, message } from "antd";
 import TagsInput from "react-tagsinput";
 import "react-tagsinput/react-tagsinput.css";
 import PlusIcon from "../../../assets/Icons/plusIcon";
@@ -13,7 +13,7 @@ import {
   OptionForm,
   OptionNames,
   OptionValues,
-  StyledButton,
+  OrangeButton,
   StyledHeading,
   StyledInput,
   StyledLabel,
@@ -26,6 +26,24 @@ const ProductOptions = ({ payload, setPayload }) => {
     { id: Date.now(), name: "", values: [] },
   ]);
   const [variants, setVariants] = useState([]);
+
+  // Sync options and variants from payload in edit mode
+  useEffect(() => {
+    // Only update if payload.options or payload.variants exist and are arrays
+    if (Array.isArray(payload.options) && payload.options.length > 0) {
+      setOptions(payload.options.map(opt => ({
+        ...opt,
+        id: opt.id || Date.now() + Math.random(), // fallback for missing id
+      })));
+    }
+    if (Array.isArray(payload.variants) && payload.variants.length > 0) {
+      setVariants(payload.variants.map((variant, idx) => ({
+        ...variant,
+        key: variant.id || idx,
+        status: (variant.totalStock > 0 ? "IN STOCK" : "OUT OF STOCK"),
+      })));
+    }
+  }, [payload.options, payload.variants]);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
 
@@ -86,17 +104,37 @@ const ProductOptions = ({ payload, setPayload }) => {
       name: variant.join(" / "),
       sku: "",
       MSRP: 0,
-      price: 0,
-      totalStock: 0,
-      status: "OUT OF STOCK",
+      price: 10,
+      totalStock: 10,
+      status: "IN STOCK",
       image: "",
       imageKey: `variant_image_${index}`,
       uploading: false,
     }));
-    setVariants(newVariants);
+    // If no combinations produced (e.g., option values are empty), create a default single variant
+    let finalVariants = newVariants;
+    if (newVariants.length === 0) {
+      const defaultName = options.map(opt => opt.name || "").filter(Boolean).join(" / ") || "Default";
+      finalVariants = [
+        {
+          key: Date.now(),
+          name: defaultName,
+          sku: "",
+          MSRP: 0,
+          price: 0,
+          totalStock: 0,
+          status: "OUT OF STOCK",
+          image: "",
+          imageKey: `variant_image_0`,
+          uploading: false,
+        },
+      ];
+      message.info("No option values provided — created a default variant.");
+    }
+    setVariants(finalVariants);
     setPayload((prevPayload) => ({
       ...prevPayload,
-      variants: newVariants,
+      variants: finalVariants,
     }));
   };
 
@@ -106,14 +144,15 @@ const ProductOptions = ({ payload, setPayload }) => {
       totalStock: record.totalStock,
       ...record,
     });
-    setEditingKey(record.key);
+    setEditingKey(String(record.key));
   };
 
   const handleSave = async (key) => {
+    console.log("Saving variant with key:", key);
     try {
       const row = await form.validateFields();
       const newVariants = variants.map((item) => {
-        if (item.key === key) {
+        if (String(item.key) === String(key)) {
           return {
             ...item,
             ...row,
@@ -138,7 +177,7 @@ const ProductOptions = ({ payload, setPayload }) => {
   };
 
   const handleDelete = (key) => {
-    const newVariants = variants.filter((item) => item.key !== key);
+    const newVariants = variants.filter((item) => String(item.key) !== String(key));
     setVariants(newVariants);
     setPayload((prevPayload) => ({
       ...prevPayload,
@@ -146,7 +185,7 @@ const ProductOptions = ({ payload, setPayload }) => {
     }));
   };
 
-  const isEditing = (record) => record.key === editingKey;
+  const isEditing = (record) => String(record.key) === String(editingKey);
 
 
   const handleImageChange = async (info, key) => {
@@ -157,18 +196,31 @@ const ProductOptions = ({ payload, setPayload }) => {
       return;
     }
     console.log("File to be uploaded:", fileObj);
-    const variantIndex = variants.findIndex((variant) => variant.key === key);
+    const variantIndex = variants.findIndex((variant) => String(variant.key) === String(key));
     if (variantIndex === -1) {
       console.error("Variant not found for key:", key);
       return;
     }
     let updatedVariants = [...variants];
+    // Ensure the variant has an imageKey so the form submission can attach files by key
+    const filePreviewUrl = URL.createObjectURL(fileObj);
     updatedVariants[variantIndex].uploading = true;
+    // set immediate preview so user sees selected image instantly
+    updatedVariants[variantIndex].previewUrl = filePreviewUrl;
+    if (!updatedVariants[variantIndex].imageKey) {
+      updatedVariants[variantIndex].imageKey = `variant_image_${variantIndex}`;
+    }
     setVariants(updatedVariants);
     setPayload((prevPayload) => ({ ...prevPayload, variants: updatedVariants }));
     try {
       const { url, key: s3Key } = await uploadFileToS3(fileObj);
-      updatedVariants[variantIndex].image = url; 
+      // After successful upload we store the s3Key and url
+      // revoke the local preview URL created earlier
+      if (updatedVariants[variantIndex].previewUrl) {
+        try { URL.revokeObjectURL(updatedVariants[variantIndex].previewUrl); } catch (e) {}
+        updatedVariants[variantIndex].previewUrl = undefined;
+      }
+      updatedVariants[variantIndex].image = url;
       updatedVariants[variantIndex].s3Key = s3Key;
       updatedVariants[variantIndex].uploading = false;
       setVariants(updatedVariants);
@@ -235,34 +287,44 @@ const ProductOptions = ({ payload, setPayload }) => {
         </OptionForm>
       ))}
       <VariantsWrapper>
-        <StyledButton onClick={generateVariants}>
+        <OrangeButton onClick={generateVariants}>
           Generate Variants
-        </StyledButton>
-{variants.length > 0 && (
-        <div className="variants-list">
-        <br />
-          <h2>Variants</h2>
-          <Form form={form} component={false}>
-            <Table
-              components={{
-                body: {
-                  cell: EditableCell,
-                },
-              }}
-              bordered={false}
-              dataSource={variants}
-              columns={columns}
-              rowClassName="editable-row"
-              pagination={false}
-              style={{ 
-                border: "1px solid #e5e7eb", 
-                borderRadius: "8px",
-                overflow: "hidden"
-              }}
-            />
-          </Form>
-        </div>)
-        }
+        </OrangeButton>
+        {variants.length > 0 ? (
+          <div className="variants-list">
+            <br />
+            <h2>Variants</h2>
+            <Form form={form} component={false}>
+              <Table
+                components={{
+                  body: {
+                    cell: EditableCell,
+                  },
+                }}
+                bordered={false}
+                dataSource={variants}
+                columns={columns}
+                rowClassName="editable-row"
+                pagination={false}
+                style={{ 
+                  border: "1px solid #e5e7eb", 
+                  borderRadius: "8px",
+                  overflow: "hidden"
+                }}
+              />
+            </Form>
+          </div>
+        ) : (
+          <div className="variants-empty">
+            <div className="variants-empty-row">
+              <div style={{ width: 120 }}>Image</div>
+              <div style={{ flex: 1 }}>Groups</div>
+              <div style={{ width: 80, textAlign: 'right' }}>$0.00</div>
+              <div style={{ width: 60, textAlign: 'center' }}>0</div>
+              <div style={{ width: 140 }}>OUT OF STOCK</div>
+            </div>
+          </div>
+        )}
       </VariantsWrapper>
     </MainContainer>
   );
