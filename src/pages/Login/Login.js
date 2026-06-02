@@ -5,6 +5,7 @@ import logo from "../../assets/Images/logo.png";
 import { useLoginMutation } from "../../api/authApi";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../store/authSlice";
+import { AUTH_LOGGED_OUT_KEY } from "../../utils/logout";
 import { message } from "antd";
 
 const Login = () => {
@@ -21,9 +22,10 @@ const Login = () => {
       console.log('\n\n result \n\n', result);
       if (result && (result.user.role === 'SUPPLIER')) {
         console.log('\n\n result \n\n', result);
+        sessionStorage.removeItem(AUTH_LOGGED_OUT_KEY);
         dispatch(setToken(result.token));
         sessionStorage.setItem("user", username);
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       } else {
         message.error("Unauthorized user role");
       }

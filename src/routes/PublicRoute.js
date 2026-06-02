@@ -1,9 +1,11 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 
 const PublicRoute = ({ children }) => {
-  return sessionStorage.getItem("user") ? (
-    <Navigate to="/dashboard" />
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? (
+    <Navigate to="/dashboard" replace />
   ) : (
     children
   );

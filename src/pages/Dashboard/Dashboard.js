@@ -30,7 +30,7 @@ import LogoutIcon from "../../assets/Icons/logoutIcon";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useLogoutMutation } from "../../api/authApi";
-import { clearToken } from "../../store/authSlice";
+import { performLogout } from "../../utils/logout";
 const { Header, Content, Sider } = Layout;
 
 const siderStyle = {
@@ -83,10 +83,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await logout().unwrap(); // Call the logout API
-      dispatch(clearToken()); // Clear token from redux state
-      sessionStorage.clear(); // Clear all session storage
-      navigate("/login"); // Redirect to login page
+      await performLogout({ dispatch, navigate, logoutMutation: logout });
       message.success("Successfully logged out!");
     } catch (error) {
       message.error("Failed to log out.");

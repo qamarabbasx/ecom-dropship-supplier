@@ -16,6 +16,9 @@ export const authApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+    verifyUser: builder.query({
+      query: () => "auth",
+    }),
     login: builder.mutation({
       query: (credentials) => ({
         url: "auth/login-v1",
@@ -339,6 +342,7 @@ export const authApi = createApi({
 });
 
 export const {
+  useVerifyUserQuery,
   useLoginMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,

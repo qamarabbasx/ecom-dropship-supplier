@@ -12,10 +12,22 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import AddProductPage from "./pages/AddProductPage";
+import { AuthProvider, useAuth } from "./auth/AuthProvider";
 
-function App() {
+const SUPPLIER_ROLES = ["SUPPLIER"];
+
+function DefaultRedirect() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <Navigate to="/login" replace />
+  );
+}
+
+function AppRoutes() {
   return (
-    <Router>
+    <AuthProvider allowedRoles={SUPPLIER_ROLES}>
       <Routes>
         <Route
           path="/login"
@@ -57,9 +69,16 @@ function App() {
             </PrivateRoute>
           }
         />
-        {/* Catch-all route for any undefined paths */}
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<DefaultRedirect />} />
       </Routes>
+    </AuthProvider>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
     </Router>
   );
 }
