@@ -21,9 +21,10 @@ const ProductPreviewModal = ({ open, onClose, product, onDelete, onEdit }) => {
             open={open}
             onCancel={onClose}
             footer={null}
-            width={1100}
+            width="min(1100px, calc(100vw - 32px))"
             centered
             className="product-preview-modal"
+            destroyOnClose
         >
             {(isFetching) && (
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "400px", width: "100%" }}>

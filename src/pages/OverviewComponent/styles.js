@@ -1,47 +1,63 @@
 import styled from "styled-components";
+import { media } from "../../theme/breakpoints";
 
 export const DashboardContainer = styled.div`
   padding: 20px;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  ${media.downMobile`
+    padding: 0;
+  `}
 `;
 
 export const StatisticContainer = styled.div`
   margin-bottom: 20px;
-  .ant-col {
-    flex: 1 1 0;
-    max-width: none;
+  .ant-row {
+    justify-content: space-between;
   }
 `;
 
 export const TableContainer = styled.div`
   margin-top: 20px;
+  width: 100%;
+  max-width: 100%;
+
   h2 {
     font-size: 20px;
     margin-bottom: 10px;
   }
-  /* Horizontal scroll for mobile */
-  @media (max-width: 768px) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    .ant-table {
-      min-width: 600px;
-      width: max-content;
-      overflow-x: auto;
-      display: block;
-    }
+
+  .ant-table-wrapper {
+    width: 100%;
+    max-width: 100%;
   }
+
   .ant-table {
     background: #fff;
     border-radius: 8px;
-    overflow: hidden;
+
     .ant-table-thead > tr > th {
       background-color: #f5f5f5;
+      white-space: nowrap;
+    }
+
+    .ant-table-tbody > tr > td {
+      white-space: nowrap;
     }
   }
+
+  ${media.downTablet`
+    .ant-table-container {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+    }
+  `}
 `;
 
 export const OverviewHeader = styled.div`
   margin-top: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -1,8 +1,12 @@
 import styled from "styled-components";
+import { media } from "../../../theme/breakpoints";
 
 export const TableWrapper = styled.div`
   padding: 20px 0 32px;
   margin-top: 20px;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 
   .loading-wrapper {
     display: flex;
@@ -15,6 +19,18 @@ export const TableWrapper = styled.div`
     border-radius: 8px;
     border: 1px solid #f0f0f0;
   }
+
+  ${media.upDesktop`
+    .ant-table {
+      width: 100%;
+    }
+  `}
+
+  ${media.downTablet`
+    .ant-table {
+      min-width: 640px;
+    }
+  `}
 
   .ant-table-thead > tr > th {
     background-color: #fafafa;

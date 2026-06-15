@@ -1,10 +1,13 @@
 import styled from "styled-components";
 import { Button } from "antd";
+import { media } from "../../theme/breakpoints";
 
 export const Container = styled.div`
-  max-width: 800px;
+  max-width: min(800px, 100%);
+  width: 100%;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
 `;
 
 export const Section = styled.div`
@@ -43,26 +46,29 @@ export const SaveButton = styled(Button)`
 
 export const StatusRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+
+  ${media.downMobile`
+    grid-template-columns: 1fr;
+    gap: 12px;
+  `}
 `;
 
 export const StatusItem = styled.div`
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 `;
 
-export const StatusLabel = styled.div`
-  font-size: 12px;
+export const StatusLabel = styled.span`
+  font-size: 13px;
   color: #8c8c8c;
-  margin-bottom: 4px;
 `;
 
-export const StatusValue = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f1f1f;
+export const StatusValue = styled.span`
+  font-size: 15px;
+  font-weight: 500;
+  color: #262626;
 `;

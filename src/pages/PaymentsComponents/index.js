@@ -3,6 +3,8 @@ import {
   MainContainer,
   MainHeading,
   ProductsHeader,
+  SearchRow,
+  FiltersRow,
   FilterContainer,
   CustomSelect,
   StyledOption,
@@ -45,17 +47,14 @@ const PaymentsComponent = () => {
     <MainContainer>
       <MainHeading>Payment History</MainHeading>
       <ProductsHeader>
-        <div>
+        <SearchRow>
           <Search
             placeholder="Search"
             onSearch={(value) => setSearchFilter(value)}
             onChange={handleSearch}
-            style={{
-              width: 300,
-            }}
           />
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
+        </SearchRow>
+        <FiltersRow>
           <FilterContainer>
             <CustomSelect defaultValue="Today" onChange={handleDateChange}>
               <StyledOption value="Today">Today</StyledOption>
@@ -76,7 +75,7 @@ const PaymentsComponent = () => {
               <StyledOption value="CANCELLED">Cancelled</StyledOption>
             </CustomSelect>
           </FilterContainer>
-        </div>
+        </FiltersRow>
       </ProductsHeader>
       <PaymentsListing
         searchFilter={searchFilter}

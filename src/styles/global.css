@@ -34,4 +34,18 @@
   .page-width{
     width: 80%;
     margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 1024px) {
+    .page-width {
+      width: 100%;
+      padding: 0 24px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-width {
+      padding: 0 16px;
+    }
   }

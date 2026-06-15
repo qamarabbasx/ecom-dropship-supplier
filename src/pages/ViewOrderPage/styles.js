@@ -11,6 +11,8 @@ export const PageHeader = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
 `;
 
 export const Breadcrumb = styled.div`
@@ -144,7 +146,7 @@ export const AddressSection = styled.div`
   gap: 16px;
   margin-top: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
 `;

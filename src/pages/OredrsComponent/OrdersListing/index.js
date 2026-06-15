@@ -21,7 +21,7 @@ const OrdersListing = ({
   const [limit] = useState(10);
   const [sortBy, setSortBy] = useState("order.created");
   const [sortOrder, setSortOrder] = useState("DESC");
-  const [supplier] = useState(true);
+  const [supplier] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
@@ -108,6 +108,7 @@ const OrdersListing = ({
           dataSource={orderListingData?.results || []}
           rowKey="id"
           loading={isLoading}
+          scroll={{ x: "max-content" }}
           onChange={handleTableChange}
           pagination={{
             current: page,

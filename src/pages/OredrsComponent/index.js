@@ -3,6 +3,9 @@ import {
   MainContainer,
   MainHeading,
   ProductsHeader,
+  SearchRow,
+  ActionsRow,
+  ToolbarRow,
   StyledButton,
 } from "./styles";
 import { ExportOutlined, CalendarOutlined, FilterOutlined } from "@ant-design/icons";
@@ -186,48 +189,44 @@ const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder  }) => {
     <MainContainer>
       <MainHeading>Orders</MainHeading>
       <ProductsHeader>
-        <div>
+        <SearchRow>
           <Search
             placeholder="Search"
             value={searchInput}
             onSearch={(value) => setSearchFilter(value.trim())}
             onChange={handleSearch}
-            style={{
-              width: 350,
-            }}
           />
-        </div>
-        <div>
+        </SearchRow>
+        <ActionsRow>
           <StyledButton onClick={handleAddOrderClick}>{`Add Order`}</StyledButton>
-        </div>
+        </ActionsRow>
       </ProductsHeader>
-      <ProductsHeader style={{ marginTop: '16px' }}>
-        <div></div>
-        <div>
-          <Space size="middle">
-            <Button icon={<ExportOutlined />} onClick={handleExportOrders}>Export</Button>
-            <RangePicker
-              placeholder={["Start Date", "End Date"]}
-              suffixIcon={<CalendarOutlined />}
-              format="YYYY-MM-DD"
-              onChange={handleDateChange}
-              style={{ height: '32px' }}
-            />
-            <FilterDrawer
-              visible={filterVisible}
-              onClose={() => setFilterVisible(false)}
-              onApplyFilter={handleApplyFilter}
+      <ToolbarRow>
+        <Space size="middle" wrap>
+          <Button icon={<ExportOutlined />} onClick={handleExportOrders}>
+            Export
+          </Button>
+          <RangePicker
+            placeholder={["Start Date", "End Date"]}
+            suffixIcon={<CalendarOutlined />}
+            format="YYYY-MM-DD"
+            onChange={handleDateChange}
+            style={{ height: "32px" }}
+          />
+          <FilterDrawer
+            visible={filterVisible}
+            onClose={() => setFilterVisible(false)}
+            onApplyFilter={handleApplyFilter}
+          >
+            <Button
+              icon={<FilterOutlined />}
+              onClick={() => setFilterVisible(!filterVisible)}
             >
-              <Button
-                icon={<FilterOutlined />}
-                onClick={() => setFilterVisible(!filterVisible)}
-              >
-                Filters
-              </Button>
-            </FilterDrawer>
-          </Space>
-        </div>
-      </ProductsHeader>
+              Filters
+            </Button>
+          </FilterDrawer>
+        </Space>
+      </ToolbarRow>
       <OrdersListing
         searchFilter={searchFilter}
         startDate={startDate}

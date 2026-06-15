@@ -6,6 +6,10 @@
   border-bottom: 1px solid #e1e1e1;
   background-color: #fff;
   padding-left: 20px;
+  height: auto !important;
+  line-height: normal;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .sider {
@@ -50,12 +54,75 @@
   height: 64px;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.menuButton {
+  flex-shrink: 0;
+  padding: 4px !important;
+  height: auto !important;
+}
+.contentArea {
+  flex: 1;
+  box-sizing: border-box;
+  margin-left: 0;
+  padding: 20px;
+}
+@media (max-width: 768px) {
+  .header {
+    padding: 8px 12px;
+  }
+  .header_wrapper {
+    flex-wrap: nowrap;
+    height: 56px;
+    gap: 10px;
+  }
+  .name {
+    margin-left: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .name h2 {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .profile_name {
+    flex: 0 0 auto;
+    gap: 4px;
+  }
+  .profileNameText {
+    display: none;
+  }
+  .user_icon img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+}
+@media (max-width: 1024px) {
+  .contentArea {
+    padding: 24px 24px 20px;
+  }
+}
+@media (max-width: 480px) {
+  .contentArea {
+    padding: 16px;
+  }
+  .name h3.greetingSub {
+    display: none;
+  }
 }
 .name {
   display: flex;
   align-items: center;
   gap: 5px;
   margin-left: 20px;
+  min-width: 0;
+  flex: 1 1 auto;
   h2 {
     color: #2e2a40;
     font-family: Inter;
@@ -82,8 +149,14 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  flex-shrink: 0;
+  max-width: 100%;
   h3 {
     margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
     color: var(--Greyscale-900, #1a202c);
     font-family: Inter;
     font-size: 16px;

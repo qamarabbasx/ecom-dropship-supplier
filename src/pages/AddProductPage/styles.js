@@ -10,6 +10,8 @@ export const MainHeading = styled.h2`
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  width: 85%;
+  width: min(92vw, 1240px);
+  max-width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 `;

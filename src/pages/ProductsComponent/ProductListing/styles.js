@@ -2,7 +2,11 @@ import styled from "styled-components";
 
 export const TableWrapper = styled.div`
   /* Horizontal scroll on small screens */
-  @media (max-width: 768px) {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+
+  @media (max-width: 480px) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     .ant-table {

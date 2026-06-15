@@ -33,7 +33,6 @@ const OverviewComponent = () => {
     sortBy: "created",
     sortOrder: "DESC",
     status: "ALL",
-    supplier: true,
   });
   console.log("Overview Data:", orderListingData);
 
@@ -81,30 +80,55 @@ const OverviewComponent = () => {
   );
 
   const columns = [
-    { title: "ID", dataIndex: "id", key: "id" },
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: 120,
+      ellipsis: true,
+    },
     {
       title: "Name",
       dataIndex: "customer",
       key: "customer",
+      width: 140,
+      ellipsis: true,
       render: (_, record) =>
-        `${record?.customer?.firstName} ${record?.customer?.lastName}`,
+        `${record?.customer?.firstName || ""} ${record?.customer?.lastName || ""}`.trim() ||
+        "—",
     },
     {
       title: "Address",
       key: "address",
-      render: (_, record) =>
-        `${record?.shippingAddress?.streetAddress}, ${record?.shippingAddress?.apartmentNumber}, ${record?.shippingAddress?.state}, ${record?.shippingAddress?.zip}`,
+      width: 200,
+      ellipsis: true,
+      render: (_, record) => {
+        const addr = record?.shippingAddress;
+        if (!addr) return "—";
+        const line = [
+          addr.streetAddress,
+          addr.apartmentNumber,
+          addr.state,
+          addr.zip,
+        ]
+          .filter(Boolean)
+          .join(", ");
+        return line || "—";
+      },
     },
     {
       title: "Date",
       dataIndex: "created",
       key: "created",
+      width: 110,
       render: (created) => new Date(created).toLocaleDateString(),
     },
     {
       title: "Type",
       dataIndex: "orderType",
       key: "orderType",
+      width: 130,
+      ellipsis: true,
       render: (_, record) =>
         record?.orderItems[0]?.product?.category?.name
           ? record?.orderItems[0]?.product?.category?.name
@@ -114,6 +138,7 @@ const OverviewComponent = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      width: 120,
       render: (status) => {
         const statusConfig = {
           CANCEL: { color: "#FFE8E0", textColor: "#FF6B35", text: "Canceled" },
@@ -165,9 +190,9 @@ const OverviewComponent = () => {
         <OverviewHeader>
           <OverviewHeading>Statistic Overview</OverviewHeading>
         </OverviewHeader>
-        <Row gutter={[16, 16]}>
+        <Row gutter={[12, 12]}>
           {statistics.map((stat, index) => (
-            <Col key={index} xs={24} sm={12} md={8} lg={6} xl={6}>
+            <Col key={index} xs={24} sm={12} md={8} lg={6} xl={4}>
               <Card>
                 <Statistic
                   style={{
@@ -212,6 +237,7 @@ const OverviewComponent = () => {
           columns={columns}
           dataSource={orderListingData?.results || []}
           loading={isOrdersLoading}
+          scroll={{ x: 880 }}
           onRow={(record) => ({
             onClick: () => {
               navigate("/dashboard", {

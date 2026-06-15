@@ -237,6 +237,7 @@ const Dashboard = () => {
             {isMobile && (
               <Button
                 type="text"
+                className={styles.menuButton}
                 icon={
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                     <rect
@@ -266,18 +267,25 @@ const Dashboard = () => {
                   </svg>
                 }
                 onClick={() => setDrawerVisible(true)}
-                style={{ marginRight: 16 }}
               />
             )}
             <div className={styles.name}>
-              <h2>Hi,</h2>
-              <h3>Good Morning {userProfile?.firstName}!</h3>
+              <h2>
+                {isMobile
+                  ? `Hi, ${userProfile?.firstName || ""}`
+                  : "Hi,"}
+              </h2>
+              {!isMobile && (
+                <h3 className={styles.greetingSub}>
+                  Good Morning {userProfile?.firstName}!
+                </h3>
+              )}
             </div>
             <div className={styles.profile_name}>
               <div className={styles.user_icon}>
                 <img src={user_icon} alt="user icon" />
               </div>
-              <h3>
+              <h3 className={styles.profileNameText}>
                 {userProfile?.firstName} {userProfile?.lastName}
               </h3>
               <div
@@ -338,8 +346,8 @@ const Dashboard = () => {
             }
             placement="left"
             onClose={() => setDrawerVisible(false)}
-            visible={drawerVisible}
-            bodyStyle={{ padding: 0 }}
+            open={drawerVisible}
+            styles={{ body: { padding: 0 } }}
           >
             <Menu
               mode="inline"
@@ -355,11 +363,8 @@ const Dashboard = () => {
         )}
         <Content>
           <div
-            style={{
-              marginLeft: !isMobile ? "20px" : 0,
-              padding: "20px",
-              flex: 1,
-            }}
+            className={styles.contentArea}
+            style={{ marginLeft: !isMobile ? "20px" : 0 }}
           >
             {renderContent()}
           </div>

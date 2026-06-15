@@ -209,6 +209,7 @@ const ProductListing = ({
         })}
         dataSource={productListingData?.products || []}
         rowKey="id"
+        scroll={{ x: "max-content" }}
         onChange={handleTableChange}
         loading={isLoading}
         pagination={{

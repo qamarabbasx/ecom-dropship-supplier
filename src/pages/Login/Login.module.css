@@ -48,7 +48,9 @@
 .loginInput {
   padding: 10px;
   font-size: 16px;
-  width: 370px;
+  width: 100%;
+  max-width: 370px;
+  box-sizing: border-box;
   border-radius: 4px;
   border: 1px solid var(--Field-Stroke, #e1e1e1);
   background: var(--Color-Neutral-white, #fff);
@@ -184,5 +186,100 @@
 @keyframes spinner-rotate {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1024px) {
+  .loginPageWrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+    margin-top: 48px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .leftContainer {
+    width: 100%;
+    min-height: 280px;
+    border-radius: 24px;
+    box-shadow: 0 0 40px 20px rgba(255, 179, 0, 0.1);
+  }
+
+  .InnerContainer {
+    margin-top: 48px;
+    padding: 0 24px 32px;
+    box-sizing: border-box;
+  }
+
+  .rightContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logoWrapper {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .loginContainer {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .inputWrapper,
+  .btnWrapper {
+    width: 100%;
+  }
+
+  .mainHeading {
+    font-size: 32px;
+  }
+
+  .mainSubHeading {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .loginPageWrapper {
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .leftContainer {
+    display: none;
+  }
+
+  .loginContainer {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+
+  .loginContainer h2 {
+    font-size: 24px;
+  }
+
+  .loginContainer p {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .loginInput {
+    max-width: 100%;
+  }
+
+  .inputWrapper {
+    width: 100%;
+  }
+
+  .btnWrapper {
+    width: 100%;
   }
 }

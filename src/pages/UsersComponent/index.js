@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MainContainer, MainHeading, ProductsHeader } from "./styles";
+import { MainContainer, MainHeading, ProductsHeader, SearchRow, ActionsRow } from "./styles";
 import { Input } from "antd";
 import UsersListing from "./UsersListing";
 import AntButton from "../../uiKits/Button";
@@ -26,17 +26,16 @@ const UsersComponent = ({ onAddUser }) => {
       <MainHeading>Users</MainHeading>
 
       <ProductsHeader>
-        <div>
+        <SearchRow>
           <Search
-            placeholder="input search text"
+            placeholder="Search users"
             onSearch={(value) => setSearchFilter(value)}
             onChange={handleSearch}
-            style={{
-              width: 300,
-            }}
           />
-        </div>
-        <AntButton onClick={goToForm}>Add User</AntButton>
+        </SearchRow>
+        <ActionsRow>
+          <AntButton onClick={goToForm}>Add User</AntButton>
+        </ActionsRow>
       </ProductsHeader>
       <UsersListing searchFilter={searchFilter} />
     </MainContainer>

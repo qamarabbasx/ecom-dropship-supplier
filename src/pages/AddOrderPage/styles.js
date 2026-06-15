@@ -64,7 +64,7 @@ export const FormGrid = styled.div`
       props.columns === 3 ? "repeat(2, 1fr)" : "1fr"};
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
 `;

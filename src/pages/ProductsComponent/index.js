@@ -3,6 +3,9 @@ import {
   MainContainer,
   MainHeading,
   ProductsHeader,
+  SearchRow,
+  ActionsRow,
+  ToolbarRow,
   StyledButton,
 } from "./styles";
 import { CalendarOutlined, ExportOutlined, FilterOutlined } from "@ant-design/icons";
@@ -150,32 +153,28 @@ const ProductsComponent = ({ onAddProduct }) => {
     <MainContainer>
       <MainHeading>Products</MainHeading>
       <ProductsHeader>
-        <div>
+        <SearchRow>
           <Search
-            placeholder="input search text"
+            placeholder="Search products"
             onSearch={(value) => setSearchFilter(value)}
             onChange={handleSearch}
-            style={{
-              width: 300,
-            }}
           />
-        </div>
-        <div>
-          <StyledButton
-            onClick={handleAddProductClick}
-          >{`Add Product`}</StyledButton>
-        </div>
+        </SearchRow>
+        <ActionsRow>
+          <StyledButton onClick={handleAddProductClick}>Add Product</StyledButton>
+        </ActionsRow>
       </ProductsHeader>
-      {/* <FilterButtons onDateChange={handleDateChange} */}
-      <div style={{ marginBottom: 16, marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-        <Space size="middle">
-          <Button icon={<ExportOutlined />} onClick={handleExportProducts}>Export</Button>
+      <ToolbarRow>
+        <Space size="middle" wrap>
+          <Button icon={<ExportOutlined />} onClick={handleExportProducts}>
+            Export
+          </Button>
           <DatePicker.RangePicker
             placeholder={["Start Date", "End Date"]}
             suffixIcon={<CalendarOutlined />}
             format="YYYY-MM-DD"
             onChange={(dates, dateStrings) => handleDateChange(dates, dateStrings)}
-            style={{ height: '32px' }}
+            style={{ height: "32px" }}
           />
           <FilterDrawer
             visible={filterVisible}
@@ -194,7 +193,7 @@ const ProductsComponent = ({ onAddProduct }) => {
             </Button>
           </FilterDrawer>
         </Space>
-      </div>
+      </ToolbarRow>
       <ProductListing
         searchFilter={searchFilter}
         startDate={startDate}

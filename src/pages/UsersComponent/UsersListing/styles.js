@@ -1,17 +1,26 @@
 import styled from "styled-components";
+import { media } from "../../../theme/breakpoints";
 
-// Container for the table
 export const StyledTableContainer = styled.div`
   background-color: #fff;
   border-radius: 8px;
   margin-top: 40px;
   padding: 20px 0 32px;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 
   .ant-table {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     background: #fff;
   }
+
+  ${media.downTablet`
+    .ant-table {
+      min-width: 640px;
+    }
+  `}
 
   .ant-table-thead > tr > th {
     background-color: #fafafa;
