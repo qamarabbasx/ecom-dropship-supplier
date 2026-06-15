@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Form, Input, Button, message } from "antd";
+import { Form, Input, message } from "antd";
 import {
   Container,
   Section,
@@ -9,6 +9,9 @@ import {
   StatusItem,
   StatusLabel,
   StatusValue,
+  StripeActions,
+  StripeRefreshButton,
+  StripeConnectButton,
 } from "./styles";
 import {
   useGetUserProfileQuery,
@@ -237,17 +240,20 @@ const ProfileSettings = () => {
               </StatusValue>
             </StatusItem>
           </StatusRow>
-          <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-            <Button onClick={refetchConnectStatus} loading={isFetchingConnectStatus}>
+          <StripeActions>
+            <StripeRefreshButton
+              onClick={refetchConnectStatus}
+              loading={isFetchingConnectStatus}
+            >
               Refresh Status
-            </Button>
-            <SaveButton
+            </StripeRefreshButton>
+            <StripeConnectButton
               onClick={handleConnectOnboarding}
               loading={isCreatingOnboardingLink}
             >
               {connectStatus?.isConnected ? "Update Stripe Connect" : "Connect Stripe"}
-            </SaveButton>
-          </div>
+            </StripeConnectButton>
+          </StripeActions>
         </Section>
       )}
     </Container>

@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import AntButton from "../../../uiKits/Button";
 import AntInput from "../../../uiKits/Input";
+import { media } from "../../../theme/breakpoints";
 
 export const MainContainer = styled.div`
   border: 1px solid #b5b3b3;
@@ -50,10 +51,18 @@ export const OptionForm = styled.div`
   align-items: end;
   justify-content: space-between;
   padding: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
   .react-tagsinput {
     border: 1px solid #bdbdbd;
     border-radius: 6px;
   }
+
+  ${media.downMobile`
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  `}
 `;
 
 export const StyledLabel = styled.h3`
@@ -67,9 +76,20 @@ export const StyledLabel = styled.h3`
 
 export const OptionNames = styled.div`
   width: 20%;
+  min-width: 0;
+
+  ${media.downMobile`
+    width: 100%;
+  `}
 `;
 export const OptionValues = styled.div`
   width: 70%;
+  min-width: 0;
+  flex: 1;
+
+  ${media.downMobile`
+    width: 100%;
+  `}
   .react-tagsinput-tag {
     background-color: #f2f2f2;
     border-radius: 10px;
@@ -89,6 +109,12 @@ export const IconWrapper = styled.span`
 export const VariantsWrapper = styled.div`
   margin-top: 10px;
   padding: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  ${media.downMobile`
+    padding: 12px;
+  `}
 
   .ant-table {
     font-size: 16px;
@@ -134,6 +160,7 @@ export const VariantsWrapper = styled.div`
     display: flex;
     gap: 16px;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .variants-empty-row > div {

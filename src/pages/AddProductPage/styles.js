@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import AntBreadCrumbs from "../../uiKits/BreadCrums";
+import { media } from "../../theme/breakpoints";
 
 export const StyledBreadCrumbs = styled(AntBreadCrumbs)``;
 
@@ -14,4 +15,9 @@ export const MainHeading = styled.h2`
   max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+
+  ${media.downMobile`
+    font-size: 24px;
+    width: 100%;
+  `}
 `;

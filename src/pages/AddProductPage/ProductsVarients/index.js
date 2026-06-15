@@ -306,10 +306,11 @@ const ProductOptions = ({ payload, setPayload }) => {
                 columns={columns}
                 rowClassName="editable-row"
                 pagination={false}
-                style={{ 
-                  border: "1px solid #e5e7eb", 
+                scroll={{ x: "max-content" }}
+                style={{
+                  border: "1px solid #e5e7eb",
                   borderRadius: "8px",
-                  overflow: "hidden"
+                  overflow: "hidden",
                 }}
               />
             </Form>
