@@ -20,7 +20,7 @@ import { formatItemType } from "./OrdersListing/itemType.utils";
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
-const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder  }) => {
+const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder }) => {
 
   const handleAddOrderClick = () => {
     if (onAddOrder) {
@@ -197,9 +197,9 @@ const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder  }) => {
             onChange={handleSearch}
           />
         </SearchRow>
-        <ActionsRow>
+        {/* <ActionsRow>
           <StyledButton onClick={handleAddOrderClick}>{`Add Order`}</StyledButton>
-        </ActionsRow>
+        </ActionsRow> */}
       </ProductsHeader>
       <ToolbarRow>
         <Space size="middle" wrap>

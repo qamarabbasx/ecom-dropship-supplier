@@ -102,7 +102,9 @@ export const StyledTextArea = styled(AntTextArea)``;
 export const BottomContainer = styled.div`
   margin-top: 60px;
   display: flex;
+  flex-wrap: wrap;
   gap: 3%;
+  align-items: flex-start;
 
   ${media.downTablet`
     flex-direction: column;
@@ -129,6 +131,19 @@ export const RightCol = styled.div`
   `}
 `;
 
+export const FormActions = styled.div`
+  width: 63%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 40px;
+
+  ${media.downTablet`
+    width: 100%;
+    margin-top: 0;
+    order: 3;
+  `}
+`;
+
 export const ProductOrganization = styled.div`
   border-radius: 5px;
   border: 1px solid #b5b3b3;
@@ -145,7 +160,6 @@ export const ProductMetaData = styled.div`
 
 export const StyledSaveButton = styled(AntButton)`
   padding: 14px 36px;
-  margin-top: 40px;
   background: #f88e48;
   border-color: #f88e48;
   color: #fff;

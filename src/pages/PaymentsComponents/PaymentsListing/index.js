@@ -1,5 +1,5 @@
 // TableComponent.js
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Table, Spin, message } from "antd";
 import { StyledTableWrapper } from "./styles";
 import { columns } from "./columns";
@@ -13,18 +13,86 @@ const PaymentsListing = ({ searchFilter, statusFilter, dateFilter }) => {
   const [sortBy] = useState("created");
   const [sortOrder] = useState("DESC");
 
-  const { data: orderListingData, error, isLoading, refetch } = useGetInvoicesQuery({
+  const formatDateParam = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const { startDate, endDate } = useMemo(() => {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    switch (dateFilter) {
+      case "Yesterday": {
+        const yesterday = new Date(todayStart);
+        yesterday.setDate(yesterday.getDate() - 1);
+        return {
+          startDate: formatDateParam(yesterday),
+          endDate: formatDateParam(yesterday),
+        };
+      }
+      case "Last 7 Days": {
+        const start = new Date(todayStart);
+        start.setDate(start.getDate() - 6);
+        return {
+          startDate: formatDateParam(start),
+          endDate: formatDateParam(todayEnd),
+        };
+      }
+      case "Last 30 Days": {
+        const start = new Date(todayStart);
+        start.setDate(start.getDate() - 29);
+        return {
+          startDate: formatDateParam(start),
+          endDate: formatDateParam(todayEnd),
+        };
+      }
+      case "This Month": {
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        return {
+          startDate: formatDateParam(start),
+          endDate: formatDateParam(todayEnd),
+        };
+      }
+      case "Last Month": {
+        const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const end = new Date(now.getFullYear(), now.getMonth(), 0);
+        return {
+          startDate: formatDateParam(start),
+          endDate: formatDateParam(end),
+        };
+      }
+      case "Today":
+        return {
+          startDate: formatDateParam(todayStart),
+          endDate: formatDateParam(todayEnd),
+        };
+      case "All Time":
+      default:
+        return {
+          startDate: undefined,
+          endDate: undefined,
+        };
+    }
+  }, [dateFilter]);
+
+  const { data: orderListingData, error, isLoading } = useGetInvoicesQuery({
     page,
     limit,
     sortBy,
     sortOrder,
     searchFilter,
+    startDate,
+    endDate,
     status: statusFilter !== "ALL" ? statusFilter : undefined,
   });
 
   useEffect(() => {
-    refetch();
-  }, [searchFilter, statusFilter, dateFilter, refetch]);
+    setPage(1);
+  }, [searchFilter, statusFilter, dateFilter]);
 
   useEffect(() => {
     if (error) {

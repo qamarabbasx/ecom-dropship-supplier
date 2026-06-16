@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Dropdown, Tag, Space, message, Spin, Modal } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined, DownOutlined, LoadingOutlined } from "@ant-design/icons";
+import { EyeOutlined, /* EditOutlined, */ DeleteOutlined, DownOutlined, LoadingOutlined } from "@ant-design/icons";
 import { formatItemType } from "./itemType.utils";
 
 const statusConfig = {
@@ -195,12 +195,14 @@ const getColumns = (onEditOrder, onViewOrder, updateOrderStatus, deleteOrder) =>
             size="small"
             onClick={() => onViewOrder && onViewOrder(record)}
           />
+          {/* Temporarily hidden — re-enable when order edit is ready
           <Button
             type="text"
             icon={<EditOutlined />}
             size="small"
             onClick={() => onEditOrder && onEditOrder(record)}
           />
+          */}
           <Button
             type="text"
             danger

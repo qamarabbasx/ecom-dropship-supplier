@@ -87,6 +87,14 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
     };
     return statusColors[status] || "#F5F5F5";
   };
+  const getStatusLabel = (status) => {
+    if (status === "FULL_FILLED" || status === "DELIVERED") return "Fulfilled";
+    if (status === "SHIPPED") return "In Transit";
+    if (status === "PROCESSING" || status === "IN_PROGRESS" || status === "PENDING")
+      return "Processing";
+    if (status === "CANCELED") return "Disputed";
+    return "Processing";
+  };
 
   const getStatusTextColor = (status) => {
     const colors = {
@@ -263,7 +271,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
             marginBottom: "24px",
           }}
         >
-          <input
+          {/* <input
             type="text"
             placeholder="Search"
             style={{
@@ -272,7 +280,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
               borderRadius: "6px",
               width: "250px",
             }}
-          />
+          /> */}
         </div>
 
         <Tabs defaultActiveKey="1">
@@ -320,7 +328,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                     color={getStatusColor(orderData.status)}
                     textColor={getStatusTextColor(orderData.status)}
                   >
-                    {orderData.status}
+                    {getStatusLabel(orderData.status)}
                   </StatusBadge>
                 </div>
               </div>

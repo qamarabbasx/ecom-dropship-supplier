@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Form, message } from "antd";
 import TagsInput from "react-tagsinput";
 import "react-tagsinput/react-tagsinput.css";
@@ -27,23 +27,31 @@ const ProductOptions = ({ payload, setPayload }) => {
   ]);
   const [variants, setVariants] = useState([]);
 
-  // Sync options and variants from payload in edit mode
+  // Hydrate local option/variant state when switching products (not on every payload edit)
   useEffect(() => {
-    // Only update if payload.options or payload.variants exist and are arrays
     if (Array.isArray(payload.options) && payload.options.length > 0) {
-      setOptions(payload.options.map(opt => ({
-        ...opt,
-        id: opt.id || Date.now() + Math.random(), // fallback for missing id
-      })));
+      setOptions(
+        payload.options.map((opt) => ({
+          ...opt,
+          id: opt.id || `local-${Date.now()}-${Math.random()}`,
+        }))
+      );
+    } else if (!payload.id) {
+      setOptions([{ id: Date.now(), name: "", values: [] }]);
     }
+
     if (Array.isArray(payload.variants) && payload.variants.length > 0) {
-      setVariants(payload.variants.map((variant, idx) => ({
-        ...variant,
-        key: variant.id || idx,
-        status: (variant.totalStock > 0 ? "IN STOCK" : "OUT OF STOCK"),
-      })));
+      setVariants(
+        payload.variants.map((variant, idx) => ({
+          ...variant,
+          key: variant.id || idx,
+          status: variant.totalStock > 0 ? "IN STOCK" : "OUT OF STOCK",
+        }))
+      );
+    } else {
+      setVariants([]);
     }
-  }, [payload.options, payload.variants]);
+  }, [payload.id]);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
 
@@ -95,16 +103,24 @@ const ProductOptions = ({ payload, setPayload }) => {
     );
   };
 
+  const resolveVariantPrice = () => {
+    const productPrice = payload.price;
+    if (productPrice === "" || productPrice == null) return 10;
+    const parsed = Number(productPrice);
+    return Number.isFinite(parsed) ? parsed : 10;
+  };
+
   const generateVariants = () => {
     console.log("Generating variants with options:", options);
     if (options.length === 0) return [];
+    const variantPrice = resolveVariantPrice();
     const tagsArrays = options.map((option) => option.values);
     const newVariants = cartesianProduct(tagsArrays).map((variant, index) => ({
       key: index,
       name: variant.join(" / "),
       sku: "",
       MSRP: 0,
-      price: 10,
+      price: variantPrice,
       totalStock: 10,
       status: "IN STOCK",
       image: "",
@@ -306,7 +322,8 @@ const ProductOptions = ({ payload, setPayload }) => {
                 columns={columns}
                 rowClassName="editable-row"
                 pagination={false}
-                scroll={{ x: "max-content" }}
+                tableLayout="fixed"
+                scroll={{ x: 770 }}
                 style={{
                   border: "1px solid #e5e7eb",
                   borderRadius: "8px",

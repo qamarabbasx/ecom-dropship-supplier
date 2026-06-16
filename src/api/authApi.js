@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  tagTypes: ["Orders", "Warehouses"],
+  tagTypes: ["Orders", "Warehouses", "Products"],
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_BASE_URL || "https://backend.ecomdropship.ai/", //"http://localhost:8000/",
     credentials: "include",
@@ -77,6 +77,7 @@ export const authApi = createApi({
           params,
         };
       },
+      providesTags: ["Products"],
     }),
     getInvoices: builder.query({
       query: ({
@@ -220,6 +221,7 @@ export const authApi = createApi({
         method: "DELETE",
         body: { products: productIds },
       }),
+      invalidatesTags: ["Products"],
     }),
     getProductById: builder.query({
       query: (id) => ({

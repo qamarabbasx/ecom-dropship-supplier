@@ -21,7 +21,7 @@ const OrdersListing = ({
   const [limit] = useState(10);
   const [sortBy, setSortBy] = useState("order.created");
   const [sortOrder, setSortOrder] = useState("DESC");
-  const [supplier] = useState(false);
+  const [supplier] = useState(true);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const [updateOrderStatus] = useUpdateOrderStatusMutation();

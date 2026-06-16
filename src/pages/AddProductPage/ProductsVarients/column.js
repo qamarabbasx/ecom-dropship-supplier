@@ -8,6 +8,16 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 
+const VARIANT_STATUS = {
+  inStock: { text: "In Stock", bg: "#E6FFF0", color: "#2E8A3A" },
+  outOfStock: { text: "Out Of Stock", bg: "#FFF0F0", color: "#C0392B" },
+};
+
+const getVariantStatusStyle = (status) => {
+  const normalized = String(status || "").toLowerCase().replace(/_/g, " ").trim();
+  return normalized === "in stock" ? VARIANT_STATUS.inStock : VARIANT_STATUS.outOfStock;
+};
+
 export const getColumns = (
   handleDelete,
   handleImageChange,
@@ -28,7 +38,7 @@ export const getColumns = (
           showUploadList={false}
           beforeUpload={() => false}
           onChange={(info) => handleImageChange(info, record.key)}
-          style={{ border: "2px dashed #f88e48" }}
+          className="variant-image-upload"
         >
           {text ? (
             <img
@@ -37,11 +47,11 @@ export const getColumns = (
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
-            <div style={{ color: "#f88e48", fontSize: "1px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
               <img
                 src={upload}
                 alt="Upload"
-                style={{ width: 32, height: 32, color: "#fa8c16" }}
+                style={{ width: 28, height: 28 }}
               />
             </div>
           )}
@@ -52,27 +62,33 @@ export const getColumns = (
       title: "Groups",
       dataIndex: "name",
       key: "name",
-      width: 350,
+      width: 140,
+      ellipsis: true,
       render: (text) => {
-        const groups = text.split(" / ");
-        const colors = ["#fecaca", "#bbf7d0", "#fef08a"]; // Red, Green, Yellow backgrounds
-        const textColors = ["#991b1b", "#166534", "#854d0e"]; // Darker text colors
+        const groups = String(text || "").split(" / ").filter(Boolean);
+        const colors = ["#fecaca", "#bbf7d0", "#fef08a"];
+        const textColors = ["#991b1b", "#166534", "#854d0e"];
 
         return (
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            <span style={{ fontWeight: "500", marginRight: "8px" }}>
-              {text.split(" / ")[0]}
-            </span>
-            {groups.slice(1).map((group, index) => (
+          <div
+            style={{
+              display: "flex",
+              gap: "6px",
+              flexWrap: "wrap",
+              maxWidth: 140,
+            }}
+          >
+            {groups.map((group, index) => (
               <Tag
-                key={index}
+                key={`${group}-${index}`}
                 style={{
                   backgroundColor: colors[index % colors.length],
                   color: textColors[index % textColors.length],
                   border: "none",
                   borderRadius: "4px",
-                  padding: "2px 12px",
+                  padding: "2px 10px",
                   fontSize: "14px",
+                  margin: 0,
                 }}
               >
                 {group}
@@ -105,21 +121,24 @@ export const getColumns = (
       dataIndex: "status",
       key: "status",
       width: 150,
-      render: (text) => (
-        <Tag
-          style={{
-            backgroundColor: text === "In Stock" ? "#d1fae5" : "#fee2e2",
-            color: text === "In Stock" ? "#065f46" : "#991b1b",
-            border: "none",
-            borderRadius: "6px",
-            padding: "4px 16px",
-            fontSize: "14px",
-            fontWeight: "500",
-          }}
-        >
-          {text}
-        </Tag>
-      ),
+      render: (text) => {
+        const status = getVariantStatusStyle(text);
+        return (
+          <Tag
+            style={{
+              backgroundColor: status.bg,
+              color: status.color,
+              border: "none",
+              borderRadius: "6px",
+              padding: "4px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            {status.text}
+          </Tag>
+        );
+      },
     },
     {
       title: "Action",

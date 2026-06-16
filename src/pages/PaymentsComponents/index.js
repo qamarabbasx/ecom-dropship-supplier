@@ -27,8 +27,8 @@ const onSearch = (value, _e, info) => console.log(info?.source, value);
 const PaymentsComponent = () => {
   const [searchFilter, setSearchFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [dateFilter, setDateFilter] = useState("Today");
-  
+  const [dateFilter, setDateFilter] = useState("All Time");
+
   const handleSearch = (event) => {
     const value = event.target.value;
     setSearchFilter(value.trim());
@@ -56,7 +56,8 @@ const PaymentsComponent = () => {
         </SearchRow>
         <FiltersRow>
           <FilterContainer>
-            <CustomSelect defaultValue="Today" onChange={handleDateChange}>
+            <CustomSelect defaultValue="All Time" onChange={handleDateChange}>
+              <StyledOption value="All Time">All Time</StyledOption>
               <StyledOption value="Today">Today</StyledOption>
               <StyledOption value="Yesterday">Yesterday</StyledOption>
               <StyledOption value="Last 7 Days">Last 7 Days</StyledOption>
@@ -70,9 +71,10 @@ const PaymentsComponent = () => {
               <StyledOption value="ALL">All</StyledOption>
               <StyledOption value="APPROVED">Approved</StyledOption>
               <StyledOption value="COMPLETED">Completed</StyledOption>
-              <StyledOption value="FAILED">Failed</StyledOption>
               <StyledOption value="PENDING">Pending</StyledOption>
               <StyledOption value="CANCELLED">Cancelled</StyledOption>
+              <StyledOption value="FAILED">Failed</StyledOption>
+              <StyledOption value="REFUNDED">Refunded</StyledOption>
             </CustomSelect>
           </FilterContainer>
         </FiltersRow>

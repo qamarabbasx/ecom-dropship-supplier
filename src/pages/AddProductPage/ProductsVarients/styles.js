@@ -138,6 +138,32 @@ export const VariantsWrapper = styled.div`
     background-color: #f9fafb;
   }
 
+  .variants-list .ant-table-thead > tr > th:first-child,
+  .variants-list .ant-table-tbody > tr > td:first-child {
+    padding: 12px 10px;
+    overflow: visible;
+  }
+
+  .variants-list .ant-upload-wrapper.ant-upload-picture-card-wrapper {
+    display: block;
+    width: 80px !important;
+  }
+
+  .variants-list .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select {
+    width: 80px !important;
+    height: 80px !important;
+    margin: 0 !important;
+    border: 2px dashed #f88e48;
+    border-radius: 8px;
+    background-color: #fff;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .variants-list .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select:hover {
+    border-color: #ef7a33;
+  }
+
   .ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select {
     border: 2px dashed #f88e48;
     border-radius: 8px;

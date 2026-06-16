@@ -17,6 +17,8 @@ const InvoiceContainer = styled.div`
   padding: 0;
   background: #fff;
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
 `;
 
 const InvoiceHeader = styled.div`
@@ -25,6 +27,12 @@ const InvoiceHeader = styled.div`
   align-items: flex-start;
   padding: 40px 60px;
   border-bottom: 1px solid #e8e8e8;
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
 `;
 
 const LogoSection = styled.div`
@@ -49,6 +57,10 @@ const CompanyInfoRight = styled.div`
     color: #666;
     line-height: 1.6;
   }
+
+  @media (max-width: 768px) {
+    text-align: left;
+  }
 `;
 
 const ActionButtonsRow = styled.div`
@@ -57,6 +69,11 @@ const ActionButtonsRow = styled.div`
   gap: 12px;
   padding: 20px 60px;
   border-bottom: 1px solid #e8e8e8;
+
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+    justify-content: flex-start;
+  }
 `;
 
 const IconButton = styled.div`
@@ -82,6 +99,10 @@ const IconButton = styled.div`
 
 const InvoiceContent = styled.div`
   padding: 40px 60px;
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+  }
 `;
 
 const InvoiceTitle = styled.div`
@@ -107,6 +128,12 @@ const InvoiceTitle = styled.div`
     color: #666;
     margin-top: 4px;
   }
+
+  @media (max-width: 768px) {
+    margin-bottom: 24px;
+    align-items: flex-start;
+    gap: 8px;
+  }
 `;
 
 const AddressContainer = styled.div`
@@ -114,6 +141,12 @@ const AddressContainer = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 60px;
   margin-bottom: 40px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
 `;
 
 const AddressBlock = styled.div`
@@ -156,9 +189,22 @@ const AmountDueBox = styled.div`
     font-size: 14px;
     color: #595959;
   }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin-bottom: 24px;
+
+    .amount {
+      font-size: 34px;
+    }
+  }
 `;
 
 const StyledTable = styled(Table)`
+  .ant-table-wrapper {
+    overflow-x: auto;
+  }
+
   .ant-table {
     font-size: 13px;
   }
@@ -175,6 +221,18 @@ const StyledTable = styled(Table)`
     padding: 16px;
     border-bottom: 1px solid #f0f0f0;
   }
+
+  @media (max-width: 768px) {
+    .ant-table {
+      min-width: 560px;
+      font-size: 12px;
+    }
+
+    .ant-table-thead > tr > th,
+    .ant-table-tbody > tr > td {
+      padding: 10px;
+    }
+  }
 `;
 
 const SummarySection = styled.div`
@@ -184,6 +242,15 @@ const SummarySection = styled.div`
 
   .summary-content {
     width: 350px;
+  }
+
+  @media (max-width: 768px) {
+    justify-content: stretch;
+    margin-top: 16px;
+
+    .summary-content {
+      width: 100%;
+    }
   }
 `;
 

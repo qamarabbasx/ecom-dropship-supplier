@@ -12,6 +12,7 @@ import {
   BottomContainer,
   LeftCol,
   RightCol,
+  FormActions,
   ProductOrganization,
   ProductMetaData,
   StyledSaveButton,
@@ -26,10 +27,37 @@ import {
 import { ADD_PRODUCT_PAYLOAD } from "../../../utils/constants";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { authApi } from "../../../api/authApi";
 const { Option } = StyledSelect;
+
+const normalizeProductOptions = (options = []) => {
+  const seen = new Set();
+  return options
+    .filter((opt) => {
+      const key = opt.name?.trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map((opt) => ({
+      id: opt.id,
+      name: opt.name,
+      values: opt.values || [],
+    }));
+};
+
+const getVendorDisplayName = (owner) => {
+  if (!owner) return "";
+  const name = [owner.firstName, owner.lastName].filter(Boolean).join(" ").trim();
+  if (name) return name;
+  if (owner.email) return owner.email.split("@")[0];
+  return "";
+};
 
 const ProductForm = ({ ProductData }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { data: categoriesData } = useGetCategoriesQuery();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const categories = categoriesData?.categories || [];
@@ -67,14 +95,9 @@ const ProductForm = ({ ProductData }) => {
         badge: productInfo.badge || "",
         sku: productInfo.sku || "",
         stock_status: productInfo.stock_status || "",
-        vendor: "", // Not in response, keep empty
+        vendor: getVendorDisplayName(productInfo.owner),
         images: [], // Will be handled separately for existing images
-        options:
-          productInfo.options?.map((opt) => ({
-            id: opt.id,
-            name: opt.name,
-            values: opt.values || [],
-          })) || [],
+        options: normalizeProductOptions(productInfo.options),
         variants:
           productInfo.variants?.map((variant) => ({
             id: variant.id,
@@ -93,6 +116,7 @@ const ProductForm = ({ ProductData }) => {
           totalInfluencers: productInfo.metaData?.totalInfluencers || "",
           totalComments: productInfo.metaData?.totalComments || "",
         },
+        metaDataId: productInfo.metaData?.id || "",
         existingImages: productInfo.images || [], // Keep track of existing images
       });
 
@@ -114,25 +138,25 @@ const ProductForm = ({ ProductData }) => {
       if (value === "others") {
         setIsCustomCategory(true);
         setCustomCategory("");
-        setPayload({ ...payload, category: "" });
+        setPayload((prev) => ({ ...prev, category: "" }));
       } else if (
         Array.isArray(categories) &&
         categories.some((cat) => cat.id === value)
       ) {
         setIsCustomCategory(false);
-        setPayload({ ...payload, category: value }); // value is the id
+        setPayload((prev) => ({ ...prev, category: value }));
         setCustomCategory("");
       } else {
         setCustomCategory(value);
-        setPayload({ ...payload, category: value });
+        setPayload((prev) => ({ ...prev, category: value }));
       }
     } else {
-      setPayload({ ...payload, [key]: value });
+      setPayload((prev) => ({ ...prev, [key]: value }));
     }
   };
 
   const handleProductImages = (images) => {
-    setPayload({ ...payload, images });
+    setPayload((prev) => ({ ...prev, images }));
   };
 
   const handleMeta = (key, value) => {
@@ -148,6 +172,7 @@ const ProductForm = ({ ProductData }) => {
   const handleAddProduct = async () => {
     let formData = new FormData();
 
+    const metaFields = (({ totalVideos, ...rest }) => rest)(payload.meta);
     const productPayload = {
       name: payload.name,
       description: payload.description,
@@ -158,7 +183,13 @@ const ProductForm = ({ ProductData }) => {
       badge: payload.badge,
       sku: payload.sku,
       stock_status: payload.stock_status,
-      options: payload.options.map(({ name, values }) => ({ name, values })),
+      options: payload.options
+        .filter((opt) => opt.name?.trim())
+        .map((opt) => ({
+          ...(isEditMode && opt.id && !String(opt.id).startsWith("local-") && { id: opt.id }),
+          name: opt.name,
+          values: opt.values,
+        })),
       variants: payload.variants.map((variant) => ({
         ...(isEditMode && variant.id && { id: variant.id }),
         name: variant.name,
@@ -169,8 +200,10 @@ const ProductForm = ({ ProductData }) => {
         lowStockThreshold: variant.lowStockThreshold,
         ...(variant.s3Key && { s3Key: variant.s3Key, image: variant.image }),
       })),
-      // Remove totalVideos from metaData before sending
-      metaData: (({ totalVideos, ...rest }) => rest)(payload.meta),
+      metaData:
+        isEditMode && payload.metaDataId
+          ? { id: payload.metaDataId, ...metaFields }
+          : metaFields,
     };
 
     formData.append("product", JSON.stringify(productPayload));
@@ -190,35 +223,25 @@ const ProductForm = ({ ProductData }) => {
     });
 
     try {
-      let response;
-
       if (isEditMode && payload.id) {
-        // Call edit API with product ID
-        response = await editProduct({ id: payload.id, formData });
+        await editProduct({ id: payload.id, formData }).unwrap();
       } else {
-        // Call add API
-        response = await addProduct(formData);
+        await addProduct(formData).unwrap();
       }
 
-      console.log(`${isEditMode ? "Edit" : "Add"} Product Response:`, response);
-
-      if (response?.data) {
-        message.success(
-          isEditMode
-            ? "Product Updated Successfully"
-            : "Product Added Successfully"
-        );
-        navigate("/dashboard", { state: { selectedKey: "products" } });
-      } else if (response?.error) {
-        console.log("Product Response Error:", response?.error);
-        message.error(
-          `Failed to ${isEditMode ? "update" : "add"} product: ` +
-            (response.error.data?.message || response.error.message)
-        );
-      }
+      message.success(
+        isEditMode
+          ? "Product Updated Successfully"
+          : "Product Added Successfully"
+      );
+      dispatch(authApi.util.invalidateTags(["Products"]));
+      navigate("/dashboard", { state: { selectedKey: "products" } });
     } catch (err) {
       console.log("Error with product:", err);
-      message.error(`Failed to ${isEditMode ? "update" : "add"} product.`);
+      message.error(
+        `Failed to ${isEditMode ? "update" : "add"} product: ` +
+          (err?.data?.message || err?.message || "Unknown error")
+      );
     }
   };
 
@@ -241,7 +264,7 @@ const ProductForm = ({ ProductData }) => {
               value={customCategory}
               onChange={(e) => {
                 setCustomCategory(e.target.value);
-                setPayload({ ...payload, category: e.target.value });
+                setPayload((prev) => ({ ...prev, category: e.target.value }));
               }}
             />
           ) : (
@@ -371,27 +394,6 @@ const ProductForm = ({ ProductData }) => {
               </div>
             )}
           </ProductMetaData>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            <StyledSaveButton
-              size="large"
-              onClick={handleAddProduct}
-              loading={isLoading || isEditLoading}
-              disabled={isLoading || isEditLoading}
-            >
-              {isLoading || isEditLoading
-                ? isEditMode
-                  ? "Updating Product..."
-                  : "Adding Product..."
-                : isEditMode
-                ? "Update Product"
-                : "Add Product"}
-            </StyledSaveButton>
-          </div>
         </LeftCol>
         <RightCol>
           <StyledLabel>{`Product Organization`}</StyledLabel>
@@ -411,6 +413,8 @@ const ProductForm = ({ ProductData }) => {
               placeholder="Vendor Name"
               value={payload.vendor || ""}
               onChange={(e) => handleInputField("vendor", e.target.value)}
+              readOnly={isEditMode}
+              title={isEditMode ? "Vendor is the product owner from your catalog" : undefined}
             />
             <StyledLabel>{`Stock Status`}</StyledLabel>
             <StyledSelect
@@ -441,6 +445,22 @@ const ProductForm = ({ ProductData }) => {
             />
           </ProductOrganization>
         </RightCol>
+        <FormActions>
+          <StyledSaveButton
+            size="large"
+            onClick={handleAddProduct}
+            loading={isLoading || isEditLoading}
+            disabled={isLoading || isEditLoading}
+          >
+            {isLoading || isEditLoading
+              ? isEditMode
+                ? "Updating Product..."
+                : "Adding Product..."
+              : isEditMode
+              ? "Update Product"
+              : "Add Product"}
+          </StyledSaveButton>
+        </FormActions>
       </BottomContainer>
     </MainContainer>
   );
