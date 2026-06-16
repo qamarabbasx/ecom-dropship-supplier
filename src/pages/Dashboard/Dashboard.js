@@ -283,7 +283,10 @@ const Dashboard = () => {
             </div>
             <div className={styles.profile_name}>
               <div className={styles.user_icon}>
-                <img src={user_icon} alt="user icon" />
+                <img
+                  src={userProfile?.profileUrl || user_icon}
+                  alt="user icon"
+                />
               </div>
               <h3 className={styles.profileNameText}>
                 {userProfile?.firstName} {userProfile?.lastName}

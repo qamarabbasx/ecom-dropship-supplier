@@ -96,12 +96,6 @@
   .profileNameText {
     display: none;
   }
-  .user_icon img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
 }
 @media (max-width: 1024px) {
   .contentArea {
@@ -144,6 +138,19 @@
 }
 .user_icon {
   display: inherit;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.user_icon img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 .profile_name {
   display: flex;

@@ -20,6 +20,7 @@ import {
 } from "../../api/authApi";
 import { useChangePasswordMutation } from "../../api/authApi";
 import { useUpdateUserMutation } from "../../api/authApi";
+import ProfileAvatarUpload from "./ProfileAvatarUpload";
 
 const ProfileSettings = () => {
   const [profileForm] = Form.useForm();
@@ -123,6 +124,7 @@ const ProfileSettings = () => {
     <Container>
       <Section>
         <Title>Profile Information</Title>
+        <ProfileAvatarUpload userProfile={userProfile} onUpdated={refetch} />
         <Form layout="vertical" form={profileForm} onFinish={handleProfileSave}>
           <Form.Item name="firstName" label="First Name">
             <Input />

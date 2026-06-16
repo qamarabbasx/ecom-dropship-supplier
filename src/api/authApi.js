@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  tagTypes: ["Orders", "Warehouses", "Products"],
+  tagTypes: ["Orders", "Warehouses", "Products", "UserProfile"],
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_BASE_URL || "https://backend.ecomdropship.ai/", //"http://localhost:8000/",
     credentials: "include",
@@ -161,6 +161,7 @@ export const authApi = createApi({
         url: "users/profile",
         method: "GET",
       }),
+      providesTags: ["UserProfile"],
     }),
     changePassword: builder.mutation({
       query: (passwordData) => ({
@@ -194,6 +195,7 @@ export const authApi = createApi({
         method: "PATCH",
         body: userData,
       }),
+      invalidatesTags: ["UserProfile"],
     }),
     logout: builder.mutation({
       query: () => ({
