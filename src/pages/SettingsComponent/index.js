@@ -46,18 +46,16 @@ const ProfileSettings = () => {
   );
 
   const handleProfileSave = async (values) => {
-    console.log("Profile Information:", values);
     const { firstName, lastName, phoneNumber } = values;
     try {
       const response = await updateUser({ firstName, lastName, phoneNumber });
       if (response.error) {
-        throw new Error(response.error.message);
+        throw new Error(response.error?.data?.message || response.error?.message);
       }
       message.success("Profile updated successfully!");
       refetch();
     } catch (error) {
-      message.error("Failed to update profile. Please try again.");
-      console.error(error);
+      message.error(error?.message || "Failed to update profile. Please try again.");
     }
   };
 
