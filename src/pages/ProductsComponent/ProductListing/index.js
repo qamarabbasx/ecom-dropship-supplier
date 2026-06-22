@@ -18,6 +18,7 @@ const ProductListing = ({
   onAddProduct,
   onDataChange,
   filters = {},
+  refreshTrigger = 0,
 }) => {
   const navigate = useNavigate();
   // Use onAddProduct for edit
@@ -50,6 +51,13 @@ const ProductListing = ({
       filters?.status && filters.status !== "All" ? filters.status : undefined,
     owner: filters?.owner && filters.owner.length > 0 ? filters.owner.join(",") : undefined,
   });
+
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      refetch();
+    }
+  }, [refreshTrigger, refetch]);
+
   const handleTableChange = (pagination, filters, sorter) => {
     const { field, order } = sorter;
     const newSortOrder = order === "ascend" ? "ASC" : "DESC";

@@ -45,6 +45,13 @@ export const productApi = createApi({
     getSupplierProducts: builder.query({
       query: () => `products`,
     }),
+    bulkImportProducts: builder.mutation({
+      query: (formData) => ({
+        url: "products/bulk-import",
+        method: "POST",
+        body: formData,
+      }),
+    }),
   }),
 });
 
@@ -55,4 +62,5 @@ export const {
   useGetProductsQuery,
   useGetProductDetailQuery,
   useGetSupplierProductsQuery,
+  useBulkImportProductsMutation,
 } = productApi;

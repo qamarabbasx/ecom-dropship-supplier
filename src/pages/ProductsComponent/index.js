@@ -11,6 +11,7 @@ import {
 import { CalendarOutlined, ExportOutlined, FilterOutlined } from "@ant-design/icons";
 import { Button, DatePicker, Input, Space, message } from "antd";
 import ProductListing from "./ProductListing";
+import BulkProductUpload from "./BulkProductUpload";
 import FilterDrawer from "../OredrsComponent/FilterDrawer";
 import { STATUS_MAP } from "./ProductListing/statusUtils";
 import jsPDF from "jspdf";
@@ -26,6 +27,7 @@ const ProductsComponent = ({ onAddProduct }) => {
   const [filterVisible, setFilterVisible] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [productsData, setProductsData] = useState([]);
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
 
   const handleAddProductClick = (product) => {
     if (onAddProduct) {
@@ -161,7 +163,12 @@ const ProductsComponent = ({ onAddProduct }) => {
           />
         </SearchRow>
         <ActionsRow>
-          <StyledButton onClick={handleAddProductClick}>Add Product</StyledButton>
+          <Space>
+            <StyledButton onClick={() => setBulkUploadOpen(true)}>
+              Bulk Upload
+            </StyledButton>
+            <StyledButton onClick={handleAddProductClick}>Add Product</StyledButton>
+          </Space>
         </ActionsRow>
       </ProductsHeader>
       <ToolbarRow>
@@ -201,6 +208,10 @@ const ProductsComponent = ({ onAddProduct }) => {
         onAddProduct={handleAddProductClick}
         onDataChange={setProductsData}
         filters={appliedFilters}
+      />
+      <BulkProductUpload
+        open={bulkUploadOpen}
+        onClose={() => setBulkUploadOpen(false)}
       />
     </MainContainer>
   );

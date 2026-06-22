@@ -25,6 +25,7 @@ import {
   useGetCategoriesQuery,
 } from "../../../api/productApi";
 import { ADD_PRODUCT_PAYLOAD } from "../../../utils/constants";
+import { PRODUCT_BADGE_OPTIONS, getBadgeLabel } from "../../../utils/productBulkImport";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -400,13 +401,21 @@ const ProductForm = ({ ProductData }) => {
           <ProductOrganization>
             <StyledLabel>{`Product Badge`}</StyledLabel>
             <StyledSelect
-              placeholder="Enter Product Badge"
+              placeholder="Select Product Badge"
               value={payload.badge || undefined}
               onChange={(value) => handleInputField("badge", value)}
             >
-              <Option value="SOLD">Sold</Option>
-              <Option value="NEW">New</Option>
-              <Option value="INCOMMING">Incomming</Option>
+              {PRODUCT_BADGE_OPTIONS.map((badge) => (
+                <Option key={badge.value} value={badge.value}>
+                  {badge.label}
+                </Option>
+              ))}
+              {payload.badge &&
+                !PRODUCT_BADGE_OPTIONS.some((b) => b.value === payload.badge) && (
+                  <Option value={payload.badge}>
+                    {getBadgeLabel(payload.badge)}
+                  </Option>
+                )}
             </StyledSelect>
             <StyledLabel>{`Vendors`}</StyledLabel>
             <StyledInput
