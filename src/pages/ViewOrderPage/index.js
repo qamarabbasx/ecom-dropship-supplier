@@ -69,9 +69,8 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   }
 
   const subtotal = parseFloat(orderData.amount) || 0;
-  const vat = 0;
-  const shippingRate = 5.0;
-  const grandTotal = subtotal + vat + shippingRate;
+  const taxCollected = subtotal * 0.04;
+  const grandTotal = subtotal + taxCollected;
 
   const getStatusColor = (status) => {
     const statusColors = {
@@ -214,8 +213,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...pdfBrand.text);
       doc.text(`Subtotal: $${subtotal.toFixed(2)}`, margin, finalY);
-      doc.text(`VAT (0%): $${vat.toFixed(2)}`, margin, finalY + 6);
-      doc.text(`Shipping Rate: $${shippingRate.toFixed(2)}`, margin, finalY + 12);
+      doc.text(`Tax Collected (4%): $${taxCollected.toFixed(2)}`, margin, finalY + 6);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
@@ -390,12 +388,8 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                   <SummaryValue>${subtotal.toFixed(2)}</SummaryValue>
                 </SummaryRow>
                 <SummaryRow>
-                  <SummaryLabel>VAT (0%)</SummaryLabel>
-                  <SummaryValue>${vat.toFixed(2)}</SummaryValue>
-                </SummaryRow>
-                <SummaryRow>
-                  <SummaryLabel>Shipping Rate</SummaryLabel>
-                  <SummaryValue>${shippingRate.toFixed(2)}</SummaryValue>
+                  <SummaryLabel>Tax Collected (4%)</SummaryLabel>
+                  <SummaryValue>${taxCollected.toFixed(2)}</SummaryValue>
                 </SummaryRow>
                 <GrandTotal>
                   <SummaryLabel>Grand Total</SummaryLabel>
