@@ -40,11 +40,16 @@ console.log("🚀 ~ AddOrderPage ~ orderData:", orderData)
       shippingName: orderData?.shippingAddress?.name || orderData?.customer?.firstName || "",
       email: orderData?.customer?.email || "",
       phone: orderData?.shippingAddress?.phone || "",
-      country: orderData?.shippingAddress?.country || "",
-      province: orderData?.shippingAddress?.state || "",
-      city: orderData?.shippingAddress?.city || "",
-      zipCode: orderData?.shippingAddress?.zip || "",
-      address: orderData?.shippingAddress?.streetAddress || "",
+      country: orderData?.shippingAddress?.country || orderData?.customer?.shippingAddress?.country || "",
+      province: orderData?.shippingAddress?.state || orderData?.customer?.shippingAddress?.state || "",
+      city: orderData?.shippingAddress?.city || orderData?.customer?.shippingAddress?.city || "",
+      zipCode: orderData?.shippingAddress?.zip || orderData?.customer?.shippingAddress?.zip || "",
+      address: [
+        orderData?.shippingAddress?.streetAddress || orderData?.customer?.shippingAddress?.streetAddress,
+        orderData?.shippingAddress?.apartmentNumber || orderData?.customer?.shippingAddress?.apartmentNumber,
+      ]
+        .filter(Boolean)
+        .join(", "),
     };
   };
 

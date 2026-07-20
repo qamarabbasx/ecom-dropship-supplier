@@ -109,8 +109,10 @@ const OverviewComponent = () => {
         const line = [
           addr.streetAddress,
           addr.apartmentNumber,
+          addr.city,
           addr.state,
           addr.zip,
+          addr.country,
         ]
           .filter(Boolean)
           .join(", ");

@@ -34,6 +34,21 @@ import {
 
 const { TabPane } = Tabs;
 
+const formatShippingAddress = (addr) => {
+  if (!addr) return "N/A";
+  const line = [
+    addr.streetAddress,
+    addr.apartmentNumber,
+    addr.city,
+    addr.state,
+    addr.zip,
+    addr.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  return line || "N/A";
+};
+
 const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
@@ -226,7 +241,9 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
       doc.text("Shipping Address:", margin, finalY + 35);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      const shippingAddress = orderData.customer?.shippingAddress?.streetAddress || orderData.shippingAddress?.streetAddress || "N/A";
+      const shippingAddress = formatShippingAddress(
+        orderData.customer?.shippingAddress || orderData.shippingAddress
+      );
       doc.text(shippingAddress, margin, finalY + 41);
 
       doc.setFont("helvetica", "bold");
@@ -406,7 +423,9 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                     Address
                   </AddressTitle>
                   <AddressText>
-                    {orderData.customer?.shippingAddress?.streetAddress || orderData.shippingAddress?.streetAddress || "N/A"}
+                    {formatShippingAddress(
+                      orderData.customer?.shippingAddress || orderData.shippingAddress
+                    )}
                   </AddressText>
                   {orderData.customer?.phoneNumber && (
                     <AddressText style={{ marginTop: "4px" }}>
@@ -419,7 +438,9 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                     <span style={{ color: "#0091FF" }}>📍</span> Billing Address
                   </AddressTitle>
                   <AddressText>
-                    {orderData.customer?.shippingAddress?.streetAddress || orderData.shippingAddress?.streetAddress || "N/A"}
+                    {formatShippingAddress(
+                      orderData.customer?.shippingAddress || orderData.shippingAddress
+                    )}
                   </AddressText>
                   {orderData.customer?.email && (
                     <AddressText style={{ marginTop: "4px" }}>

@@ -403,13 +403,21 @@ const InvoiceDetail = ({ invoiceId: propInvoiceId }) => {
         : "";
       doc.text(`${address}${apt}`, leftX, toY);
       toY += 13;
-      doc.text(
-        `${invoice.customer.shippingAddress.state || ""} - ${invoice.customer.shippingAddress.zip || ""
-        }`,
-        leftX,
-        toY
-      );
+      const cityLine = [
+        invoice.customer.shippingAddress.city,
+        invoice.customer.shippingAddress.state,
+      ]
+        .filter(Boolean)
+        .join(", ");
+      const zipPart = invoice.customer.shippingAddress.zip
+        ? ` - ${invoice.customer.shippingAddress.zip}`
+        : "";
+      doc.text(`${cityLine}${zipPart}`, leftX, toY);
       toY += 13;
+      if (invoice.customer.shippingAddress.country) {
+        doc.text(invoice.customer.shippingAddress.country, leftX, toY);
+        toY += 13;
+      }
       if (invoice.customer.phoneNumber) {
         doc.text(invoice.customer.phoneNumber, leftX, toY);
         toY += 13;
@@ -674,9 +682,21 @@ const InvoiceDetail = ({ invoiceId: propInvoiceId }) => {
                     `, ${invoice.customer.shippingAddress?.apartmentNumber}`}
                 </div>
                 <div className="detail">
-                  {invoice.customer.shippingAddress?.state} -{" "}
-                  {invoice.customer.shippingAddress?.zip}
+                  {[
+                    invoice.customer.shippingAddress?.city,
+                    invoice.customer.shippingAddress?.state,
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
+                  {invoice.customer.shippingAddress?.zip
+                    ? ` - ${invoice.customer.shippingAddress.zip}`
+                    : ""}
                 </div>
+                {invoice.customer.shippingAddress?.country && (
+                  <div className="detail">
+                    {invoice.customer.shippingAddress.country}
+                  </div>
+                )}
                 {invoice.customer.phoneNumber && (
                   <div className="detail">{invoice.customer.phoneNumber}</div>
                 )}
