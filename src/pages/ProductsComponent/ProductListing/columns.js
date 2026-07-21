@@ -142,13 +142,11 @@ export const getColumns = ({ onView, onEdit, onDelete } = {}) => [
     },
     sortDirections: ["ascend", "descend"],
     render: (_, record) => {
-      // Prefer explicit totalStock, fall back to variants sum or show status
-      if (typeof record.totalStock === "number") return record.totalStock;
       if (Array.isArray(record.variants) && record.variants.length) {
         return record.variants.reduce((s, v) => s + (v.totalStock || 0), 0);
       }
+      if (typeof record.totalStock === "number") return record.totalStock;
       return 0;
-      // return record.stock_status || "-";
     },
   },
 

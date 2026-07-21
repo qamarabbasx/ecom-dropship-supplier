@@ -1,12 +1,13 @@
 export const ADD_PRODUCT_PAYLOAD = {
   name: "",
   category: "",
-  price: 0,
-  MSRP: 0,
+  price: "",
+  MSRP: "",
   description: "",
   badge: "",
   vendor: "",
   stock_status: "",
+  totalStock: "",
   type: "",
   sku: "",
   meta: {

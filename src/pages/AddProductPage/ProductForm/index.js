@@ -16,6 +16,8 @@ import {
   ProductOrganization,
   ProductMetaData,
   StyledSaveButton,
+  FieldErrorMessage,
+  OrganizationField,
 } from "./styles";
 import UploadImages from "../../UploadImages/Index";
 import ProductOptions from "../ProductsVarients";
@@ -25,12 +27,24 @@ import {
   useGetCategoriesQuery,
 } from "../../../api/productApi";
 import { ADD_PRODUCT_PAYLOAD } from "../../../utils/constants";
+import {
+  validateAddProductFields,
+  hasProductVariants,
+  calculateVariantStockTotal,
+  resolveProductStock,
+} from "../../../utils/validateProductForm";
 import { PRODUCT_BADGE_OPTIONS, getBadgeLabel } from "../../../utils/productBulkImport";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authApi } from "../../../api/authApi";
 const { Option } = StyledSelect;
+
+const requiredLabel = (label, isRequired) =>
+  isRequired ? `${label} *` : label;
+
+const FieldError = ({ message }) =>
+  message ? <FieldErrorMessage>{message}</FieldErrorMessage> : null;
 
 const normalizeProductOptions = (options = []) => {
   const seen = new Set();
@@ -76,6 +90,20 @@ const ProductForm = ({ ProductData }) => {
   const [customCategory, setCustomCategory] = useState("");
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isMetaDataExpanded, setIsMetaDataExpanded] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  const hasFieldError = (field) => Boolean(fieldErrors[field]);
+
+  const getFieldError = (field) => fieldErrors[field];
+
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   // Prefill form data when in edit mode
   useEffect(() => {
@@ -96,6 +124,10 @@ const ProductForm = ({ ProductData }) => {
         badge: productInfo.badge || "",
         sku: productInfo.sku || "",
         stock_status: productInfo.stock_status || "",
+        totalStock:
+          productInfo.totalStock != null && productInfo.totalStock !== ""
+            ? parseInt(productInfo.totalStock, 10)
+            : "",
         vendor: getVendorDisplayName(productInfo.owner),
         images: [], // Will be handled separately for existing images
         options: normalizeProductOptions(productInfo.options),
@@ -134,6 +166,12 @@ const ProductForm = ({ ProductData }) => {
     }
   }, [isEditMode, productInfo, categories]);
 
+  useEffect(() => {
+    if (Array.isArray(payload.variants) && payload.variants.length > 0) {
+      clearFieldError("totalStock");
+    }
+  }, [payload.variants]);
+
   const handleInputField = (key, value) => {
     if (key === "category") {
       if (value === "others") {
@@ -147,12 +185,15 @@ const ProductForm = ({ ProductData }) => {
         setIsCustomCategory(false);
         setPayload((prev) => ({ ...prev, category: value }));
         setCustomCategory("");
+        clearFieldError("category");
       } else {
         setCustomCategory(value);
         setPayload((prev) => ({ ...prev, category: value }));
+        clearFieldError("category");
       }
     } else {
       setPayload((prev) => ({ ...prev, [key]: value }));
+      clearFieldError(key);
     }
   };
 
@@ -170,7 +211,24 @@ const ProductForm = ({ ProductData }) => {
     }));
   };
 
+  const productHasVariants = hasProductVariants(payload);
+  const calculatedVariantStock = calculateVariantStockTotal(payload.variants);
+
   const handleAddProduct = async () => {
+    if (!isEditMode) {
+      const validation = validateAddProductFields(payload);
+      if (!validation.isValid) {
+        setFieldErrors(
+          validation.missingFields.reduce(
+            (acc, { key, message }) => ({ ...acc, [key]: message }),
+            {}
+          )
+        );
+        return;
+      }
+      setFieldErrors({});
+    }
+
     let formData = new FormData();
 
     const metaFields = (({ totalVideos, ...rest }) => rest)(payload.meta);
@@ -184,6 +242,7 @@ const ProductForm = ({ ProductData }) => {
       badge: payload.badge,
       sku: payload.sku,
       stock_status: payload.stock_status,
+      totalStock: resolveProductStock(payload),
       options: payload.options
         .filter((opt) => opt.name?.trim())
         .map((opt) => ({
@@ -250,22 +309,26 @@ const ProductForm = ({ ProductData }) => {
     <MainContainer>
       <FirstRow>
         <InputWrapper>
-          <StyledLabel>{`Product Title`}</StyledLabel>
+          <StyledLabel>{requiredLabel("Product Title", !isEditMode)}</StyledLabel>
           <StyledInput
             placeholder="Enter Product Name"
             value={payload.name}
+            status={hasFieldError("name") ? "error" : undefined}
             onChange={(e) => handleInputField("name", e.target.value)}
           />
+          <FieldError message={getFieldError("name")} />
         </InputWrapper>
         <InputWrapper>
-          <StyledLabel>{`Product Category`}</StyledLabel>
+          <StyledLabel>{requiredLabel("Product Category", !isEditMode)}</StyledLabel>
           {isCustomCategory ? (
             <StyledInput
               placeholder="Enter Category"
               value={customCategory}
+              status={hasFieldError("category") ? "error" : undefined}
               onChange={(e) => {
                 setCustomCategory(e.target.value);
                 setPayload((prev) => ({ ...prev, category: e.target.value }));
+                clearFieldError("category");
               }}
             />
           ) : (
@@ -273,6 +336,7 @@ const ProductForm = ({ ProductData }) => {
               placeholder="Select Category"
               onChange={(value) => handleInputField("category", value)}
               value={payload.category || undefined}
+              status={hasFieldError("category") ? "error" : undefined}
             >
               {Array.isArray(categories) &&
                 categories.map((category) => (
@@ -283,14 +347,16 @@ const ProductForm = ({ ProductData }) => {
               <Option value="others">Others</Option>
             </StyledSelect>
           )}
+          <FieldError message={getFieldError("category")} />
         </InputWrapper>
         <InputWrapper>
-          <StyledLabel>{`Product Price`}</StyledLabel>
+          <StyledLabel>{requiredLabel("Product Price", !isEditMode)}</StyledLabel>
           <StyledInput
             type="number"
             placeholder="$90"
             value={payload.price || ""}
             step="0.01"
+            status={hasFieldError("price") ? "error" : undefined}
             onChange={(e) =>
               handleInputField(
                 "price",
@@ -298,14 +364,16 @@ const ProductForm = ({ ProductData }) => {
               )
             }
           />
+          <FieldError message={getFieldError("price")} />
         </InputWrapper>
         <InputWrapper>
-          <StyledLabel>{`MSRP`}</StyledLabel>
+          <StyledLabel>{requiredLabel("MSRP", !isEditMode)}</StyledLabel>
           <StyledInput
             type="number"
             placeholder="$90"
             step="0.01"
             value={payload.MSRP || ""}
+            status={hasFieldError("MSRP") ? "error" : undefined}
             onChange={(e) =>
               handleInputField(
                 "MSRP",
@@ -313,6 +381,34 @@ const ProductForm = ({ ProductData }) => {
               )
             }
           />
+          <FieldError message={getFieldError("MSRP")} />
+        </InputWrapper>
+        <InputWrapper>
+          <StyledLabel>
+            {productHasVariants
+              ? "Stock (from variants)"
+              : requiredLabel("Stock", !isEditMode)}
+          </StyledLabel>
+          <StyledInput
+            type="number"
+            min="0"
+            step="1"
+            placeholder="0"
+            value={
+              productHasVariants
+                ? calculatedVariantStock
+                : payload.totalStock ?? ""
+            }
+            readOnly={productHasVariants}
+            status={hasFieldError("totalStock") ? "error" : undefined}
+            onChange={(e) =>
+              handleInputField(
+                "totalStock",
+                e.target.value === "" ? "" : parseInt(e.target.value, 10)
+              )
+            }
+          />
+          <FieldError message={getFieldError("totalStock")} />
         </InputWrapper>
       </FirstRow>
 
@@ -325,13 +421,15 @@ const ProductForm = ({ ProductData }) => {
       </ImagesWrapper>
 
       <DescriptionWrapper>
-        <StyledLabel>{`Product Description `}</StyledLabel>
+        <StyledLabel>{requiredLabel("Product Description", !isEditMode)}</StyledLabel>
         <StyledTextArea
           rows={8}
           placeholder="Type Description"
           value={payload.description}
+          status={hasFieldError("description") ? "error" : undefined}
           onChange={(e) => handleInputField("description", e.target.value)}
         />
+        <FieldError message={getFieldError("description")} />
       </DescriptionWrapper>
 
       <BottomContainer>
@@ -399,59 +497,77 @@ const ProductForm = ({ ProductData }) => {
         <RightCol>
           <StyledLabel>{`Product Organization`}</StyledLabel>
           <ProductOrganization>
-            <StyledLabel>{`Product Badge`}</StyledLabel>
-            <StyledSelect
-              placeholder="Select Product Badge"
-              value={payload.badge || undefined}
-              onChange={(value) => handleInputField("badge", value)}
-            >
-              {PRODUCT_BADGE_OPTIONS.map((badge) => (
-                <Option key={badge.value} value={badge.value}>
-                  {badge.label}
-                </Option>
-              ))}
-              {payload.badge &&
-                !PRODUCT_BADGE_OPTIONS.some((b) => b.value === payload.badge) && (
-                  <Option value={payload.badge}>
-                    {getBadgeLabel(payload.badge)}
+            <OrganizationField>
+              <StyledLabel>{requiredLabel("Product Badge", !isEditMode)}</StyledLabel>
+              <StyledSelect
+                placeholder="Select Product Badge"
+                value={payload.badge || undefined}
+                status={hasFieldError("badge") ? "error" : undefined}
+                onChange={(value) => handleInputField("badge", value)}
+              >
+                {PRODUCT_BADGE_OPTIONS.map((badge) => (
+                  <Option key={badge.value} value={badge.value}>
+                    {badge.label}
                   </Option>
-                )}
-            </StyledSelect>
-            <StyledLabel>{`Vendors`}</StyledLabel>
-            <StyledInput
-              placeholder="Vendor Name"
-              value={payload.vendor || ""}
-              onChange={(e) => handleInputField("vendor", e.target.value)}
-              readOnly={isEditMode}
-              title={isEditMode ? "Vendor is the product owner from your catalog" : undefined}
-            />
-            <StyledLabel>{`Stock Status`}</StyledLabel>
-            <StyledSelect
-              placeholder="Select Status"
-              value={payload.stock_status || undefined}
-              onChange={(value) => handleInputField("stock_status", value)}
-            >
-              <Option value="IN_STOCK">IN STOCK</Option>
-              <Option value="OUT_OF_STOCK">OUT OF STOCK</Option>
-              <Option value="BACK_ORDER">BACK ORDER</Option>
-            </StyledSelect>
-            {/* <StyledLabel>{`Product Type`}</StyledLabel>
-            <StyledSelect
-              placeholder="Enter Product Type"
-              value={payload.type || undefined}
-              onChange={(value) => handleInputField("type", value)}
-            >
-              <Option value="BEST_SELLING">Best Selling</Option>
-              <Option value="REQUESTED">Requested</Option>
-              <Option value="PRIVATE_SOURCE">Private Sourcing</Option>
-              <Option value="THIRD_PARTY">Third Party</Option>
-            </StyledSelect> */}
-            <StyledLabel>{`Product SKU`}</StyledLabel>
-            <StyledInput
-              placeholder="Enter Product SKU"
-              value={payload.sku || ""}
-              onChange={(e) => handleInputField("sku", e.target.value)}
-            />
+                ))}
+                {payload.badge &&
+                  !PRODUCT_BADGE_OPTIONS.some((b) => b.value === payload.badge) && (
+                    <Option value={payload.badge}>
+                      {getBadgeLabel(payload.badge)}
+                    </Option>
+                  )}
+              </StyledSelect>
+              <FieldError message={getFieldError("badge")} />
+            </OrganizationField>
+            <OrganizationField>
+              <StyledLabel>{`Vendors`}</StyledLabel>
+              <StyledInput
+                placeholder="Vendor Name"
+                value={payload.vendor || ""}
+                onChange={(e) => handleInputField("vendor", e.target.value)}
+                readOnly={isEditMode}
+                title={isEditMode ? "Vendor is the product owner from your catalog" : undefined}
+              />
+            </OrganizationField>
+            <OrganizationField>
+              <StyledLabel>{requiredLabel("Stock Status", !isEditMode)}</StyledLabel>
+              <StyledSelect
+                placeholder="Select Status"
+                value={payload.stock_status || undefined}
+                status={hasFieldError("stock_status") ? "error" : undefined}
+                onChange={(value) => handleInputField("stock_status", value)}
+              >
+                <Option value="IN_STOCK">IN STOCK</Option>
+                <Option value="OUT_OF_STOCK">OUT OF STOCK</Option>
+                <Option value="BACK_ORDER">BACK ORDER</Option>
+              </StyledSelect>
+              <FieldError message={getFieldError("stock_status")} />
+            </OrganizationField>
+            <OrganizationField>
+              <StyledLabel>{requiredLabel("Product Type", !isEditMode)}</StyledLabel>
+              <StyledSelect
+                placeholder="Enter Product Type"
+                value={payload.type || undefined}
+                status={hasFieldError("type") ? "error" : undefined}
+                onChange={(value) => handleInputField("type", value)}
+              >
+                <Option value="BEST_SELLING">Best Selling</Option>
+                <Option value="REQUESTED">Requested</Option>
+                <Option value="PRIVATE_SOURCE">Private Sourcing</Option>
+                <Option value="THIRD_PARTY">Third Party</Option>
+              </StyledSelect>
+              <FieldError message={getFieldError("type")} />
+            </OrganizationField>
+            <OrganizationField>
+              <StyledLabel>{requiredLabel("Product SKU", !isEditMode)}</StyledLabel>
+              <StyledInput
+                placeholder="Enter Product SKU"
+                value={payload.sku || ""}
+                status={hasFieldError("sku") ? "error" : undefined}
+                onChange={(e) => handleInputField("sku", e.target.value)}
+              />
+              <FieldError message={getFieldError("sku")} />
+            </OrganizationField>
           </ProductOrganization>
         </RightCol>
         <FormActions>

@@ -109,7 +109,7 @@ export const getColumns = (
       ),
     },
     {
-      title: "QTY",
+      title: "Stock",
       dataIndex: "totalStock",
       key: "qty",
       width: 120,

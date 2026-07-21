@@ -52,6 +52,21 @@ export const InputWrapper = styled.div`
   `}
 `;
 
+export const FieldErrorMessage = styled.p`
+  color: #ff4d4f;
+  font-size: 12px;
+  margin: 4px 0 0;
+  line-height: 1.4;
+`;
+
+export const OrganizationField = styled.div`
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
 export const StyledLabel = styled.h3`
   color: var(--black-fonts-headings, #2d2e2e);
   font-family: Inter;
@@ -65,11 +80,30 @@ export const StyledInput = styled(AntInput)`
   height: 45px;
   background-color: #fff;
   width: 100%;
+
+  &:read-only {
+    background-color: #f6f6f6;
+    cursor: not-allowed;
+  }
+
+  &.ant-input-status-error,
+  &.ant-input-status-error:hover,
+  &.ant-input-status-error:focus {
+    border-color: #ff4d4f !important;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.12);
+  }
 `;
 
 export const StyledSelect = styled(AntSelect)`
   width: 100%;
   height: 45px;
+
+  &.ant-select-status-error .ant-select-selector,
+  &.ant-select-status-error:hover .ant-select-selector,
+  &.ant-select-status-error.ant-select-focused .ant-select-selector {
+    border-color: #ff4d4f !important;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.12) !important;
+  }
 `;
 
 export const ImagesWrapper = styled.div`
@@ -97,7 +131,14 @@ export const DescriptionWrapper = styled.div`
   `}
 `;
 
-export const StyledTextArea = styled(AntTextArea)``;
+export const StyledTextArea = styled(AntTextArea)`
+  &.ant-input-status-error,
+  &.ant-input-status-error:hover,
+  &.ant-input-status-error:focus {
+    border-color: #ff4d4f !important;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.12);
+  }
+`;
 
 export const BottomContainer = styled.div`
   margin-top: 60px;
