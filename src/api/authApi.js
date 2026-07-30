@@ -239,6 +239,37 @@ export const authApi = createApi({
       }),
       invalidatesTags: ["Orders"],
     }),
+    detectCarrier: builder.mutation({
+      query: ({ trackingNumber }) => ({
+        url: "orders/detect-carrier",
+        method: "POST",
+        body: { trackingNumber },
+      }),
+    }),
+    addOrderTracking: builder.mutation({
+      query: ({ orderId, trackingNumber, carrierCode, carrier }) => ({
+        url: `orders/${orderId}/tracking`,
+        method: "POST",
+        body: {
+          trackingNumber,
+          ...(carrierCode && { carrierCode }),
+          ...(carrier && { carrier }),
+        },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    updateOrderTracking: builder.mutation({
+      query: ({ orderId, trackingNumber, carrierCode, carrier }) => ({
+        url: `orders/${orderId}/tracking`,
+        method: "PATCH",
+        body: {
+          trackingNumber,
+          ...(carrierCode && { carrierCode }),
+          ...(carrier && { carrier }),
+        },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
     deleteOrder: builder.mutation({
       query: (orderId) => ({
         url: `orders/${orderId}`,
@@ -365,6 +396,9 @@ export const {
   useDeleteProductsMutation,
   useGetProductByIdQuery,
   useUpdateOrderStatusMutation,
+  useDetectCarrierMutation,
+  useAddOrderTrackingMutation,
+  useUpdateOrderTrackingMutation,
   useDeleteOrderMutation,
   useGetOrderByIdQuery,
   useGetCustomersQuery,
