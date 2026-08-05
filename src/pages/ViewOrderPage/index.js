@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, message, Modal, Spin } from "antd";
 import { useDeleteOrderMutation, useGetOrderByIdQuery } from "../../api/authApi";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { pdfBrand, pdfAutoTableBase, drawExportReportHeader } from "../../theme/exportPdfTheme";
 import logo from "../../assets/Images/logo.png";
+import AddTrackingModal from "../OredrsComponent/AddTrackingModal";
 import {
   PageContainer,
   PageHeader,
@@ -50,10 +51,16 @@ const formatShippingAddress = (addr) => {
 };
 
 const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
+  const [trackingModalOpen, setTrackingModalOpen] = useState(false);
   const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
   // Fetch fresh order data if we have an order ID
-  const { data: fetchedOrderData, isLoading: isLoadingOrder, error: orderError } = useGetOrderByIdQuery(
+  const {
+    data: fetchedOrderData,
+    isLoading: isLoadingOrder,
+    error: orderError,
+    refetch: refetchOrder,
+  } = useGetOrderByIdQuery(
     initialOrderData?.id,
     { skip: !initialOrderData?.id }
   );
@@ -86,6 +93,8 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   const subtotal = parseFloat(orderData.amount) || 0;
   const taxCollected = subtotal * 0.04;
   const grandTotal = subtotal + taxCollected;
+  const hasTracking = Boolean(orderData.carrierTrackingNumber);
+  const canAddTracking = orderData.status !== "CANCELED";
 
   const getStatusColor = (status) => {
     const statusColors = {
@@ -170,6 +179,12 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
       y += 6;
       doc.text(`Status: ${orderData.status}`, margin, y);
       y += 6;
+      if (orderData.carrierTrackingNumber) {
+        doc.text(`Carrier: ${orderData.carrier || "-"}`, margin, y);
+        y += 6;
+        doc.text(`Tracking: ${orderData.carrierTrackingNumber}`, margin, y);
+        y += 6;
+      }
       doc.text(`Date: ${new Date(orderData.created).toLocaleDateString("en-US", {
         day: "2-digit",
         month: "long",
@@ -270,6 +285,11 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
           <HeaderTitle>Orders</HeaderTitle>
         </div>
         <HeaderActions>
+          {canAddTracking && (
+            <ActionButton onClick={() => setTrackingModalOpen(true)}>
+              {hasTracking ? "Edit Tracking" : "Add Tracking"}
+            </ActionButton>
+          )}
           <ActionButton danger onClick={handleDelete} loading={isDeleting}>
             Delete
           </ActionButton>
@@ -418,6 +438,43 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
 
               <AddressSection>
                 <AddressCard>
+                  <AddressTitle>Shipment / Tracking</AddressTitle>
+                  {hasTracking ? (
+                    <AddressText>
+                      <div style={{ marginBottom: 6 }}>
+                        <strong>Carrier:</strong> {orderData.carrier || "-"}
+                      </div>
+                      <div style={{ marginBottom: 6 }}>
+                        <strong>Tracking #:</strong> {orderData.carrierTrackingNumber}
+                      </div>
+                      {orderData.shippedAt && (
+                        <div style={{ marginBottom: 6 }}>
+                          <strong>Shipped:</strong>{" "}
+                          {new Date(orderData.shippedAt).toLocaleDateString("en-US", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </div>
+                      )}
+                      {orderData.trackingUrl && (
+                        <div>
+                          <a
+                            href={orderData.trackingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "#0091FF" }}
+                          >
+                            Track package
+                          </a>
+                        </div>
+                      )}
+                    </AddressText>
+                  ) : (
+                    <AddressText>No tracking added yet.</AddressText>
+                  )}
+                </AddressCard>
+                <AddressCard>
                   <AddressTitle>
                     <span style={{ color: "#0091FF" }}>📍</span> Shipping
                     Address
@@ -460,6 +517,13 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
           </TabPane>
         </Tabs>
       </ContentContainer>
+
+      <AddTrackingModal
+        visible={trackingModalOpen}
+        order={orderData}
+        onClose={() => setTrackingModalOpen(false)}
+        onSuccess={() => refetchOrder?.()}
+      />
     </PageContainer>
   );
 };
