@@ -11,6 +11,7 @@ const DEFAULT_CARRIERS = [
   { code: "ups", name: "UPS" },
   { code: "fedex", name: "FedEx" },
   { code: "dhl", name: "DHL" },
+  { code: "ontrac", name: "OnTrac" },
   { code: "amazon", name: "Amazon Logistics" },
   { code: "other", name: "Other" },
 ];
