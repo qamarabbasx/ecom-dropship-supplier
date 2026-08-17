@@ -4,6 +4,7 @@ import { useDeleteOrderMutation, useGetOrderByIdQuery } from "../../api/authApi"
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { pdfBrand, pdfAutoTableBase, drawExportReportHeader } from "../../theme/exportPdfTheme";
+import { splitTotalIntoSubtotalAndTax } from "../../utils/orderPricing";
 import logo from "../../assets/Images/logo.png";
 import AddTrackingModal from "../OredrsComponent/AddTrackingModal";
 import {
@@ -90,9 +91,8 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
     );
   }
 
-  const subtotal = parseFloat(orderData.amount) || 0;
-  const taxCollected = subtotal * 0.04;
-  const grandTotal = subtotal + taxCollected;
+  const { subtotal, tax: taxCollected, total: grandTotal } =
+    splitTotalIntoSubtotalAndTax(orderData.amount);
   const hasTracking = Boolean(orderData.carrierTrackingNumber);
   const canAddTracking = orderData.status !== "CANCELED";
 
