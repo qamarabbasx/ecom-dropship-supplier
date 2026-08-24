@@ -173,7 +173,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...pdfBrand.text);
-      doc.text(`Order ID: ${orderData.id}`, margin, y);
+      doc.text(`Order ID: ${orderData.orderNumber != null ? `#${orderData.orderNumber}` : orderData.id}`, margin, y);
       y += 6;
       doc.text(`Order Number: ${orderData.orderTrackingId || "-"}`, margin, y);
       y += 6;
