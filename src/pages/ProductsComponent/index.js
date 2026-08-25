@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   MainContainer,
   MainHeading,
@@ -35,13 +35,24 @@ const ProductsComponent = ({ onAddProduct }) => {
     }
   };
 
+  const searchDebounceRef = useRef(null);
+
   const handleSearch = (event) => {
     const value = event.target.value;
-    setSearchFilter(value.trim());
 
-    if (value.trim() === "") {
-      setSearchFilter("");
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
     }
+    searchDebounceRef.current = setTimeout(() => {
+      setSearchFilter(value.trim());
+    }, 500);
+  };
+
+  const handleSearchSubmit = (value) => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+    setSearchFilter(value.trim());
   };
 
   const handleDateChange = (dates, dateStrings) => {
@@ -158,7 +169,7 @@ const ProductsComponent = ({ onAddProduct }) => {
         <SearchRow>
           <Search
             placeholder="Search products"
-            onSearch={(value) => setSearchFilter(value)}
+            onSearch={handleSearchSubmit}
             onChange={handleSearch}
           />
         </SearchRow>
