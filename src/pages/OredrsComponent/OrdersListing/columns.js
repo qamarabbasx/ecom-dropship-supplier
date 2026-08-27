@@ -229,10 +229,11 @@ const ActionCell = ({ record, onViewOrder, deleteOrder }) => {
 const getColumns = (onEditOrder, onViewOrder, updateOrderStatus, deleteOrder) => [
   {
     title: "Order ID",
-    dataIndex: "id",
+    dataIndex: "orderNumber",
     key: "id",
     width: 100,
     sorter: true,
+    render: (orderNumber, record) => (orderNumber != null ? `#${orderNumber}` : record.id?.slice(0, 8)),
   },
   {
     title: "Order Number",

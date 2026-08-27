@@ -126,7 +126,7 @@ const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder }) => {
         const orderType = order?.orderItems?.[0]?.product?.category?.name || "Home Delivery";
 
         return [
-          order.id,
+          order.orderNumber != null ? `#${order.orderNumber}` : order.id,
           order.orderTrackingId || "-",
           orderType,
           totalQty.toString(),
