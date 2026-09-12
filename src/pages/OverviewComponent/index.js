@@ -30,7 +30,7 @@ const OverviewComponent = () => {
   } = useGetOrdersQuery({
     page: 1,
     limit: 5,
-    sortBy: "created",
+    sortBy: "orderNumber",
     sortOrder: "DESC",
     status: "ALL",
     supplier: true,
@@ -83,10 +83,11 @@ const OverviewComponent = () => {
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
+      dataIndex: "orderNumber",
       key: "id",
       width: 120,
       ellipsis: true,
+      render: (orderNumber, record) => (orderNumber != null ? `#${orderNumber}` : record.id?.slice(0, 8)),
     },
     {
       title: "Name",
@@ -255,7 +256,7 @@ const OverviewComponent = () => {
           pagination={
             orderListingData?.total > 4
               ? {
-                pageSize: 4,
+                pageSize: 5,
                 showSizeChanger: false,
                 showTotal: false,
                 itemRender: (_, type, originalElement) => {
