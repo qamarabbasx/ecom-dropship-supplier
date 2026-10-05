@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Tabs, message, Modal, Spin } from "antd";
+import { Tabs, message, Modal, Spin, Button } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useDeleteOrderMutation, useGetOrderByIdQuery } from "../../api/authApi";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -71,6 +72,17 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
 
   if (!orderData) return null;
 
+  const backButton = onClose && (
+    <Button
+      type="link"
+      icon={<ArrowLeftOutlined />}
+      onClick={onClose}
+      style={{ padding: 0, marginBottom: "8px" }}
+    >
+      Back to Orders
+    </Button>
+  );
+
   if (isLoadingOrder) {
     return (
       <PageContainer>
@@ -84,6 +96,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   if (orderError) {
     return (
       <PageContainer>
+        {backButton}
         <div style={{ padding: "24px", textAlign: "center", color: "#ff4d4f" }}>
           Failed to load order details
         </div>
@@ -281,6 +294,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
     <PageContainer>
       <PageHeader>
         <div>
+          {backButton}
           <Breadcrumb>Orders</Breadcrumb>
           <HeaderTitle>Orders</HeaderTitle>
         </div>

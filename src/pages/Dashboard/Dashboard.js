@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-pascal-case */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Drawer, Button } from "antd";
 import logo from "../../assets/Images/logo.png";
 import user_icon from "../../assets/Images/user_icon.png";
@@ -61,6 +61,20 @@ const Dashboard = () => {
   const [selectedOrderData, setSelectedOrderData] = useState(null);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
   const [isEditOrder, setIsEditOrder] = useState(false);
+
+  // The orders list stays mounted (hidden) while an order is open, so going
+  // back keeps its page, filters and sort; scroll position is restored here.
+  const ordersScrollY = useRef(0);
+  const prevSelectedKey = useRef(selectedKey);
+  useLayoutEffect(() => {
+    const prevKey = prevSelectedKey.current;
+    prevSelectedKey.current = selectedKey;
+    if (selectedKey === "view_order") {
+      window.scrollTo(0, 0);
+    } else if (selectedKey === "orders" && prevKey === "view_order") {
+      window.scrollTo(0, ordersScrollY.current);
+    }
+  }, [selectedKey]);
 
   // Set selectedKey from navigation state if present
   React.useEffect(() => {
@@ -164,20 +178,8 @@ const Dashboard = () => {
           setSelectedKey("add_product");
         }} />;
       case "orders":
-        return (
-          <OrdersComponent
-            onAddOrder={(order) => setSelectedKey("add_order")}
-            onViewOrder={(orderData) => {
-              setSelectedOrderData(orderData);
-              setSelectedKey("view_order");
-            }}
-            onEditOrder={(orderData) => {
-              setIsEditOrder(true);
-              setSelectedOrderData(orderData);
-              setSelectedKey("add_order");
-            }}
-          />
-        );
+        // Rendered outside renderContent so it survives opening an order
+        return null;
       case "warehouses":
         return <WarehouseComponent />;
       case "users":
@@ -369,6 +371,23 @@ const Dashboard = () => {
             className={styles.contentArea}
             style={{ marginLeft: !isMobile ? "20px" : 0 }}
           >
+            {(selectedKey === "orders" || selectedKey === "view_order") && (
+              <div style={{ display: selectedKey === "orders" ? "block" : "none" }}>
+                <OrdersComponent
+                  onAddOrder={(order) => setSelectedKey("add_order")}
+                  onViewOrder={(orderData) => {
+                    ordersScrollY.current = window.scrollY;
+                    setSelectedOrderData(orderData);
+                    setSelectedKey("view_order");
+                  }}
+                  onEditOrder={(orderData) => {
+                    setIsEditOrder(true);
+                    setSelectedOrderData(orderData);
+                    setSelectedKey("add_order");
+                  }}
+                />
+              </div>
+            )}
             {renderContent()}
           </div>
         </Content>
