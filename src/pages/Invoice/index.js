@@ -531,7 +531,7 @@ const InvoiceDetail = ({ invoiceId: propInvoiceId }) => {
     doc.setDrawColor(...pdfBrand.border);
     doc.line(summaryX, finalY + 5, pageWidth - margin, finalY + 5);
 
-    doc.text(`Tax (${taxPercentage.toFixed(0)}%)`, summaryX, finalY + 20);
+    doc.text(`Tax (${taxPercentage}%)`, summaryX, finalY + 20);
     doc.text(
       `$${parseFloat(tax).toFixed(2)}`,
       pageWidth - margin,

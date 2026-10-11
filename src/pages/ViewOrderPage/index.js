@@ -5,7 +5,10 @@ import { useDeleteOrderMutation, useGetOrderByIdQuery } from "../../api/authApi"
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { pdfBrand, pdfAutoTableBase, drawExportReportHeader } from "../../theme/exportPdfTheme";
-import { splitTotalIntoSubtotalAndTax } from "../../utils/orderPricing";
+import {
+  formatTaxRate,
+  splitTotalIntoSubtotalAndTax,
+} from "../../utils/orderPricing";
 import logo from "../../assets/Images/logo.png";
 import AddTrackingModal from "../OredrsComponent/AddTrackingModal";
 import {
@@ -105,7 +108,8 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   }
 
   const { subtotal, tax: taxCollected, total: grandTotal } =
-    splitTotalIntoSubtotalAndTax(orderData.amount);
+    splitTotalIntoSubtotalAndTax(orderData.amount, orderData.taxRate);
+  const taxRateLabel = formatTaxRate(orderData.taxRate);
   const hasTracking = Boolean(orderData.carrierTrackingNumber);
   const canAddTracking = orderData.status !== "CANCELED";
 
@@ -256,7 +260,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...pdfBrand.text);
       doc.text(`Subtotal: $${subtotal.toFixed(2)}`, margin, finalY);
-      doc.text(`Tax Collected (4%): $${taxCollected.toFixed(2)}`, margin, finalY + 6);
+      doc.text(`Tax Collected (${taxRateLabel}): $${taxCollected.toFixed(2)}`, margin, finalY + 6);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
@@ -439,7 +443,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                   <SummaryValue>${subtotal.toFixed(2)}</SummaryValue>
                 </SummaryRow>
                 <SummaryRow>
-                  <SummaryLabel>Tax Collected (4%)</SummaryLabel>
+                  <SummaryLabel>Tax Collected ({taxRateLabel})</SummaryLabel>
                   <SummaryValue>${taxCollected.toFixed(2)}</SummaryValue>
                 </SummaryRow>
                 <GrandTotal>
