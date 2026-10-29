@@ -277,6 +277,18 @@ export const authApi = createApi({
       }),
       invalidatesTags: ["Orders"],
     }),
+    refundOrder: builder.mutation({
+      query: ({ orderId, method, amount, reason }) => ({
+        url: `orders/${orderId}/refund`,
+        method: "POST",
+        body: {
+          method,
+          ...(amount != null && amount !== "" && { amount: Number(amount) }),
+          ...(reason && { reason }),
+        },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
     getOrderById: builder.query({
       query: (orderId) => ({
         url: `orders/${orderId}`,
@@ -409,4 +421,5 @@ export const {
   useUpdateWareHouseManagerMutation,
   useGetStripeConnectStatusQuery,
   useCreateStripeConnectOnboardingLinkMutation,
+  useRefundOrderMutation,
 } = authApi;

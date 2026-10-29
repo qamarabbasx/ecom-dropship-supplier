@@ -11,6 +11,7 @@ import {
 } from "../../utils/orderPricing";
 import logo from "../../assets/Images/logo.png";
 import AddTrackingModal from "../OredrsComponent/AddTrackingModal";
+import RefundOrderModal, { getRefundableCents } from "./RefundOrderModal";
 import {
   PageContainer,
   PageHeader,
@@ -57,6 +58,7 @@ const formatShippingAddress = (addr) => {
 
 const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   const [trackingModalOpen, setTrackingModalOpen] = useState(false);
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
   // Fetch fresh order data if we have an order ID
@@ -112,11 +114,17 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   const taxRateLabel = formatTaxRate(orderData.taxRate);
   const hasTracking = Boolean(orderData.carrierTrackingNumber);
   const canAddTracking = orderData.status !== "CANCELED";
+  const refundedToCredits = Number(orderData.refundedCreditsCents || 0) / 100;
+  const refundedToCard = Number(orderData.refundedStripeCents || 0) / 100;
+  const canRefund =
+    !["PAYMENT_PENDING", "CANCELED"].includes(orderData.status) &&
+    getRefundableCents(orderData).remainingCents > 0;
 
   const getStatusColor = (status) => {
     const statusColors = {
       CANCEL: "#FFE8E0",
       CANCELED: "#FFE8E0",
+      REFUNDED: "#EDE9FE",
       SHIPPED: "#E0F2FF",
       DELIVERED: "#E0F9F4",
       DILEVERED: "#E0F9F4",
@@ -133,6 +141,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
     if (status === "PROCESSING" || status === "IN_PROGRESS" || status === "PENDING")
       return "Processing";
     if (status === "CANCELED") return "Disputed";
+    if (status === "REFUNDED") return "Refunded";
     return "Processing";
   };
 
@@ -140,6 +149,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
     const colors = {
       CANCEL: "#FF6B35",
       CANCELED: "#FF6B35",
+      REFUNDED: "#6D28D9",
       SHIPPED: "#0091FF",
       DELIVERED: "#00B894",
       DILEVERED: "#00B894",
@@ -308,6 +318,9 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
               {hasTracking ? "Edit Tracking" : "Add Tracking"}
             </ActionButton>
           )}
+          {canRefund && (
+            <ActionButton onClick={() => setRefundModalOpen(true)}>Refund</ActionButton>
+          )}
           <ActionButton danger onClick={handleDelete} loading={isDeleting}>
             Delete
           </ActionButton>
@@ -452,6 +465,22 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                     ${grandTotal.toFixed(2)}
                   </SummaryValue>
                 </GrandTotal>
+                {refundedToCredits > 0 && (
+                  <SummaryRow>
+                    <SummaryLabel>Refunded to store credits</SummaryLabel>
+                    <SummaryValue style={{ color: "#6D28D9" }}>
+                      -${refundedToCredits.toFixed(2)}
+                    </SummaryValue>
+                  </SummaryRow>
+                )}
+                {refundedToCard > 0 && (
+                  <SummaryRow>
+                    <SummaryLabel>Refunded to card</SummaryLabel>
+                    <SummaryValue style={{ color: "#6D28D9" }}>
+                      -${refundedToCard.toFixed(2)}
+                    </SummaryValue>
+                  </SummaryRow>
+                )}
               </SummarySection>
 
               <AddressSection>
@@ -540,6 +569,12 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
         visible={trackingModalOpen}
         order={orderData}
         onClose={() => setTrackingModalOpen(false)}
+        onSuccess={() => refetchOrder?.()}
+      />
+      <RefundOrderModal
+        open={refundModalOpen}
+        order={orderData}
+        onClose={() => setRefundModalOpen(false)}
         onSuccess={() => refetchOrder?.()}
       />
     </PageContainer>

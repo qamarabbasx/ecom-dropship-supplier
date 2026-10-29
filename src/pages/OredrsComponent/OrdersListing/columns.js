@@ -14,6 +14,7 @@ import AddTrackingModal from "../AddTrackingModal";
 const statusConfig = {
   CANCEL: { color: "#FFE8E0", textColor: "#FF6B35", text: "Canceled" },
   CANCELED: { color: "#FFE8E0", textColor: "#FF6B35", text: "Canceled" },
+  REFUNDED: { color: "#EDE9FE", textColor: "#6D28D9", text: "Refunded" },
   SHIPPED: { color: "#E0F2FF", textColor: "#0091FF", text: "Shipped" },
   DELIVERED: { color: "#E0F9F4", textColor: "#00B894", text: "Completed" },
   DILEVERED: { color: "#E0F9F4", textColor: "#00B894", text: "Completed" },
