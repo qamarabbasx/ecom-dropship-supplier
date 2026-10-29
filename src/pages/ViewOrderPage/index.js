@@ -56,6 +56,12 @@ const formatShippingAddress = (addr) => {
   return line || "N/A";
 };
 
+const formatShipToRecipient = (addr) => {
+  if (!addr) return null;
+  const name = `${addr.firstName || ""} ${addr.lastName || ""}`.trim();
+  return name || null;
+};
+
 const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
   const [trackingModalOpen, setTrackingModalOpen] = useState(false);
   const [refundModalOpen, setRefundModalOpen] = useState(false);
@@ -221,19 +227,22 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
       })}`, margin, y);
       y += 6;
 
-      const customer = orderData?.customer;
-      if (customer) {
-        doc.text(`Customer: ${customer.firstName || ""} ${customer.lastName || ""}`.trim(), margin, y);
+      const dropshipper = orderData?.customer;
+      if (dropshipper) {
+        doc.text(`Dropshipper: ${dropshipper.firstName || ""} ${dropshipper.lastName || ""}`.trim(), margin, y);
         y += 6;
-        if (customer.email) {
-          doc.text(`Email: ${customer.email}`, margin, y);
+        if (dropshipper.email) {
+          doc.text(`Email: ${dropshipper.email}`, margin, y);
           y += 6;
         }
-        if (customer.phoneNumber) {
-          doc.text(`Phone: ${customer.phoneNumber}`, margin, y);
+        if (dropshipper.phoneNumber) {
+          doc.text(`Phone: ${dropshipper.phoneNumber}`, margin, y);
           y += 6;
         }
       }
+      const checkoutCustomerName = `${orderData?.shippingAddress?.firstName || ""} ${orderData?.shippingAddress?.lastName || ""}`.trim();
+      doc.text(`Customer: ${checkoutCustomerName || "-"}`, margin, y);
+      y += 6;
 
       const tableData = orderData.orderItems?.map((item) => {
         const price = parseFloat(item.price || orderData.amount / (item.quantity || 1));
@@ -283,17 +292,26 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
       doc.text("Shipping Address:", margin, finalY + 35);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      const shippingAddress = formatShippingAddress(
-        orderData.customer?.shippingAddress || orderData.shippingAddress
-      );
-      doc.text(shippingAddress, margin, finalY + 41);
+      const shipTo = orderData.shippingAddress;
+      const shipRecipient = formatShipToRecipient(shipTo);
+      let shipY = finalY + 41;
+      if (shipRecipient) {
+        doc.text(shipRecipient, margin, shipY);
+        shipY += 5;
+      }
+      if (shipTo?.phoneNumber) {
+        doc.text(`Phone: ${shipTo.phoneNumber}`, margin, shipY);
+        shipY += 5;
+      }
+      const shippingAddress = formatShippingAddress(shipTo);
+      doc.text(shippingAddress, margin, shipY);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
-      doc.text("Billing Address:", margin, finalY + 52);
+      doc.text("Billing Address:", margin, shipY + 11);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
-      doc.text(shippingAddress, margin, finalY + 58);
+      doc.text(shippingAddress, margin, shipY + 17);
 
       // Save PDF
       doc.save(`Order_${orderData.id}_${Date.now()}.pdf`);
@@ -526,14 +544,17 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                     <span style={{ color: "#0091FF" }}>📍</span> Shipping
                     Address
                   </AddressTitle>
+                  {formatShipToRecipient(orderData.shippingAddress) && (
+                    <AddressText style={{ fontWeight: 600 }}>
+                      {formatShipToRecipient(orderData.shippingAddress)}
+                    </AddressText>
+                  )}
                   <AddressText>
-                    {formatShippingAddress(
-                      orderData.customer?.shippingAddress || orderData.shippingAddress
-                    )}
+                    {formatShippingAddress(orderData.shippingAddress)}
                   </AddressText>
-                  {orderData.customer?.phoneNumber && (
+                  {orderData.shippingAddress?.phoneNumber && (
                     <AddressText style={{ marginTop: "4px" }}>
-                      Phone: {orderData.customer.phoneNumber}
+                      Phone: {orderData.shippingAddress.phoneNumber}
                     </AddressText>
                   )}
                 </AddressCard>
@@ -542,9 +563,7 @@ const ViewOrderPage = ({ orderData: initialOrderData, onClose }) => {
                     <span style={{ color: "#0091FF" }}>📍</span> Billing Address
                   </AddressTitle>
                   <AddressText>
-                    {formatShippingAddress(
-                      orderData.customer?.shippingAddress || orderData.shippingAddress
-                    )}
+                    {formatShippingAddress(orderData.shippingAddress)}
                   </AddressText>
                   {orderData.customer?.email && (
                     <AddressText style={{ marginTop: "4px" }}>

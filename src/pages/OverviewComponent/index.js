@@ -90,13 +90,22 @@ const OverviewComponent = () => {
       render: (orderNumber, record) => (orderNumber != null ? `#${orderNumber}` : record.id?.slice(0, 8)),
     },
     {
-      title: "Name",
+      title: "Dropshipper",
       dataIndex: "customer",
       key: "customer",
       width: 140,
       ellipsis: true,
       render: (_, record) =>
         `${record?.customer?.firstName || ""} ${record?.customer?.lastName || ""}`.trim() ||
+        "—",
+    },
+    {
+      title: "Customer Name",
+      key: "customerName",
+      width: 140,
+      ellipsis: true,
+      render: (_, record) =>
+        `${record?.shippingAddress?.firstName || ""} ${record?.shippingAddress?.lastName || ""}`.trim() ||
         "—",
     },
     {

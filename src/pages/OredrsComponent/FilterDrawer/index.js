@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Popover, Checkbox, Select, Button } from "antd";
+import { Popover, Checkbox, Select, Button, Input } from "antd";
 import {
   FilterPopoverContent,
   FilterSection,
@@ -24,10 +24,13 @@ const FilterDrawer = ({
   ownerLabel = "Customer",
   // key to use when returning selected values in onApplyFilter (e.g., 'customer' or 'owner')
   ownerKey = "customer",
+  // show free-text filter on the checkout (shipping) customer name — orders only
+  showCustomerNameFilter = false,
 }) => {
   const [orderType, setOrderType] = useState([]);
   const [status, setStatus] = useState(initialStatus || "All");
   const [ownerSelection, setOwnerSelection] = useState([]);
+  const [customerName, setCustomerName] = useState("");
 
   const { data: customersData, isLoading: loadingCustomers } =
     useGetCustomersQuery();
@@ -43,6 +46,7 @@ const FilterDrawer = ({
       orderType,
       status,
     };
+    if (showCustomerNameFilter) result.customerName = customerName.trim();
     result[ownerKey] = ownerSelection;
     onApplyFilter(result);
     onClose();
@@ -52,7 +56,9 @@ const FilterDrawer = ({
     setOrderType([]);
     setStatus("All");
     setOwnerSelection([]);
+    setCustomerName("");
     const result = { orderType: [], status: "All" };
+    if (showCustomerNameFilter) result.customerName = "";
     result[ownerKey] = [];
     onApplyFilter(result);
   };
@@ -123,6 +129,20 @@ const FilterDrawer = ({
           })}
         </Select>
       </FilterSection>
+
+      {showCustomerNameFilter && (
+        <FilterSection>
+          <FilterLabel>Customer Name</FilterLabel>
+          <Input
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            onPressEnter={handleApplyFilter}
+            size="large"
+            placeholder="Search customer name"
+            allowClear
+          />
+        </FilterSection>
+      )}
 
       <div
         style={{

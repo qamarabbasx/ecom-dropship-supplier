@@ -124,6 +124,7 @@ export const authApi = createApi({
         status,
         orderType,
         customer,
+        customerName,
       }) => {
         const params = {
           page,
@@ -147,6 +148,9 @@ export const authApi = createApi({
         }
         if (customer) {
           params.customer = customer;
+        }
+        if (customerName) {
+          params.customerName = customerName;
         }
         return {
           url: "orders",

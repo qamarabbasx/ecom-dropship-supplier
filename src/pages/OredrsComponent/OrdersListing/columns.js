@@ -279,13 +279,24 @@ const getColumns = (onEditOrder, onViewOrder, updateOrderStatus, deleteOrder) =>
     sorter: true,
   },
   {
+    title: "Dropshipper",
+    key: "dropshipperName",
+    width: 180,
+    render: (_, record) => {
+      const dropshipper = record?.customer;
+      if (!dropshipper) return "-";
+      return `${dropshipper.firstName || ""} ${dropshipper.lastName || ""}`.trim() || "-";
+    },
+    sorter: true,
+  },
+  {
     title: "Customer Name",
     key: "customerName",
     width: 180,
     render: (_, record) => {
-      const customer = record?.customer;
-      if (!customer) return "-";
-      return `${customer.firstName || ""} ${customer.lastName || ""}`.trim() || "-";
+      const shipping = record?.shippingAddress;
+      if (!shipping) return "-";
+      return `${shipping.firstName || ""} ${shipping.lastName || ""}`.trim() || "-";
     },
     sorter: true,
   },

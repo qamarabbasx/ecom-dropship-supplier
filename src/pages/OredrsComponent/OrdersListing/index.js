@@ -62,6 +62,9 @@ const OrdersListing = ({
   if (appliedFilters?.customer && appliedFilters.customer.length > 0) {
     queryParams.customer = appliedFilters.customer.join(",");
   }
+  if (appliedFilters?.customerName?.trim()) {
+    queryParams.customerName = appliedFilters.customerName.trim();
+  }
 
   const {
     data: orderListingData,
@@ -76,8 +79,9 @@ const OrdersListing = ({
   }, [orderListingData, onDataChange]);
 
   const handleTableChange = (pagination, filters, sorter) => {
-    const { field, order } = sorter;
-    setSortBy(field);
+    // Computed columns (e.g. dropshipper / customer name) have no dataIndex, so fall back to the column key.
+    const { field, columnKey, order } = sorter;
+    setSortBy(field || columnKey);
     setSortOrder(order === "ascend" ? "ASC" : "DESC");
     setPage(pagination.current);
   };

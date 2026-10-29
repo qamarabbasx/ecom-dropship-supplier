@@ -115,9 +115,13 @@ const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder }) => {
 
       // Prepare table data
       const tableData = ordersData.map((order) => {
-        const customer = order?.customer;
-        const customerName = customer
-          ? `${customer.firstName || ""} ${customer.lastName || ""}`.trim()
+        const dropshipper = order?.customer;
+        const dropshipperName = dropshipper
+          ? `${dropshipper.firstName || ""} ${dropshipper.lastName || ""}`.trim() || "-"
+          : "-";
+        const shipping = order?.shippingAddress;
+        const customerName = shipping
+          ? `${shipping.firstName || ""} ${shipping.lastName || ""}`.trim() || "-"
           : "-";
         const supplierName = `${order?.orderItems?.[0]?.product?.owner?.firstName || ""} ${order?.orderItems?.[0]?.product?.owner?.lastName || ""}`.trim() || "-";
         const itemType = order?.orderItems?.[0]?.product?.type ? formatItemType(order.orderItems[0].product.type) : "Third Party";
@@ -130,6 +134,7 @@ const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder }) => {
           order.orderTrackingId || "-",
           orderType,
           totalQty.toString(),
+          dropshipperName,
           customerName,
           supplierName,
           itemType,
@@ -142,22 +147,23 @@ const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder }) => {
       autoTable(doc, {
         ...pdfAutoTableBase,
         startY: tableStartY,
-        head: [["Order ID", "Order #", "Type", "Items", "Customer", "Supplier", "Item Type", "Status", "Amount"]],
+        head: [["Order ID", "Order #", "Type", "Items", "Dropshipper", "Customer", "Supplier", "Item Type", "Status", "Amount"]],
         body: tableData,
         styles: {
           ...pdfAutoTableBase.styles,
           overflow: "linebreak",
         },
         columnStyles: {
-          0: { cellWidth: 28 },
-          1: { cellWidth: 24 },
-          2: { cellWidth: 35 },
-          3: { cellWidth: 18, halign: "center" },
-          4: { cellWidth: 40 },
-          5: { cellWidth: 35 },
-          6: { cellWidth: 32 },
+          0: { cellWidth: 24 },
+          1: { cellWidth: 22 },
+          2: { cellWidth: 28 },
+          3: { cellWidth: 14, halign: "center" },
+          4: { cellWidth: 32 },
+          5: { cellWidth: 32 },
+          6: { cellWidth: 30 },
           7: { cellWidth: 28 },
-          8: { cellWidth: 25, halign: "right" },
+          8: { cellWidth: 24 },
+          9: { cellWidth: 24, halign: "right" },
         },
         tableWidth: "auto",
       });
@@ -217,6 +223,8 @@ const OrdersComponent = ({ onAddOrder, onViewOrder, onEditOrder }) => {
             visible={filterVisible}
             onClose={() => setFilterVisible(false)}
             onApplyFilter={handleApplyFilter}
+            ownerLabel="Dropshipper"
+            showCustomerNameFilter
           >
             <Button
               icon={<FilterOutlined />}
