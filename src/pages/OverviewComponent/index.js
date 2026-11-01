@@ -57,7 +57,7 @@ const OverviewComponent = () => {
       value: overviewData?.totalSales,
       icon: "dollar",
       growth: -4.3,
-      positive: false,
+      positive: true,
     },
     {
       title: "Pending Orders",
@@ -222,7 +222,7 @@ const OverviewComponent = () => {
                       {stat.positive ? <RiseOutlined /> : <RiseOutlined />}
                     </span>
                   }
-                  suffix="%"
+                  // suffix="%"
                 />
               </Card>
             </Col>
